@@ -1,0 +1,9 @@
+﻿
+/*ruby default the width is 250px, and the the title CNCMachineAASDashboard is not set, this custom CSS style with width 300px */
+    .sidebar[b-lp2urik6ux] {
+        width: 300px; 
+        height: 100vh;
+        position: sticky;
+        top: 0;
+    }
+

@@ -1,0 +1,30 @@
+﻿@using CNCMachineAASDashboard.Shared.Models
+@using Microsoft.AspNetCore.Html
+
+@if(_SE?.modelType?.name == "Property")
+{
+    <div class="card-footer">
+        <div class="row align-items-center">
+            <div class="col-sm-8">
+                <input  type="text" class="form-control" placeholder="Value"  />
+            </div>
+            <div class="col-sm-4">
+                <div class="row">
+                    <button >Read</button>
+                    <button>">Write</button>
+                    <button >Clear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else if (_SE?.modelType?.name == "SubmodelElementCollection")
+{
+    
+}
+
+
+@code {
+    [Parameter]
+    public SubmodelElement? _SE { get; set; }
+}

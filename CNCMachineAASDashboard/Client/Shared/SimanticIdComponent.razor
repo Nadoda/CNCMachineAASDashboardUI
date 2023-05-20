@@ -1,0 +1,16 @@
+﻿@using CNCMachineAASDashboard.Shared.Models
+
+<li class="list-group-item">
+    <div class="row align-items-center">
+        <div class="col-sm-2"><b>SemanticId</b></div>
+        @foreach(var key in _SemanticId.keys)
+        {
+            <div class="col-sm-10">(@key.type)(@key.local)(@key.idType)@key.value</div>
+        }
+    </div>
+</li>
+
+@code {
+    [Parameter]
+    public SemanticId? _SemanticId { get; set; }
+}

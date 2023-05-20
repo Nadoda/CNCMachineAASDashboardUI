@@ -1,0 +1,88 @@
+﻿@page "/MaintainanceDashboard";
+@using CNCMachineAASDashboard.Shared.Models;
+@*@using BaSyx.Models.Core.AssetAdministrationShell.Implementations;*@
+@using Microsoft.AspNetCore.SignalR.Client;
+@using System.Security.Cryptography;
+@using System.Text.RegularExpressions;
+@using System.Text;
+@using CNCMachineAASDashboard.Client.Shared.SubmodelComponent;
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Maintenance Dashboard</PageTitle>
+
+
+
+@if (submodel != null)
+{
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col text-center col-6">
+                <SubmodelComponent _name="MaintenanceSubmodel_1" _submodel="@submodel"></SubmodelComponent>
+            </div>
+            <div class="col text-center col-6">
+                <SubmodelComponent _name="MaintenanceSubmodel_2" _submodel="@submodel"></SubmodelComponent>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col text-center col-6">
+                <SubmodelComponent _name="MaintenanceSubmodel_3" _submodel="@submodel"></SubmodelComponent>
+            </div>
+            <div class="col text-center col-6">
+                <SubmodelComponent _name="MaintenanceSubmodel_4" _submodel="@submodel"></SubmodelComponent>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <h1>Sorry! There is nothing at this Page</h1>
+    <h1>Check your SignalR status</h1>
+}
+
+
+
+
+@code {
+    
+    private HubConnection? hubConnection;
+
+    public bool IsConnected;
+    
+    public Submodel? submodel;
+
+    public object? SignalRData;
+
+
+
+
+
+    protected override async Task OnInitializedAsync()
+
+    {
+
+        hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/dataSend")).Build();
+
+
+        hubConnection.On<Submodel>("MaintenancedataSend", data =>
+        {
+
+            SignalRData = data;
+
+            if (data != null)
+            {
+
+                submodel = data;
+
+            }
+
+            StateHasChanged();
+        });
+        await hubConnection.StartAsync();
+
+        IsConnected = hubConnection.State == HubConnectionState.Connected ? true : false;
+        StateHasChanged();
+
+    }
+  
+
+}

@@ -1,0 +1,14 @@
+﻿@using CNCMachineAASDashboard.Shared.Models
+
+
+<li class="list-group-item">
+    <div class="row align-items-center">
+        <div class="col-sm-2"><b>identifier (@_Identification?.idType)</b></div>
+        <div class="col-sm-10">@_Identification?.id</div>
+    </div>
+</li>
+
+@code {
+    [Parameter]
+    public Identification? _Identification { get; set; }
+}

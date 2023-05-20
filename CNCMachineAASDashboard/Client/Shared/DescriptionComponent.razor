@@ -1,0 +1,17 @@
+﻿@using CNCMachineAASDashboard.Shared.Models
+
+
+<li class="list-group-item">
+    <div class="row align-items-center">
+        @foreach(var item in _Description)
+        {
+            <div class="col-sm-2"><b>identifier (@item.language)</b></div>
+            <div class="col-sm-10">@item.text</div>
+        }
+     </div>
+</li>
+
+@code {
+    [Parameter]
+    public List<Description>? _Description { get; set; }
+}
