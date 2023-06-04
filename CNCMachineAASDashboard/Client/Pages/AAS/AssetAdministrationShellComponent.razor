@@ -1,4 +1,6 @@
 ﻿@page "/"
+@using BaSyx.AAS.Client.Http;
+@using CNCMachineAASDashboard.Client.Services;
 @using Microsoft.AspNetCore.SignalR.Client
 @using Microsoft.AspNetCore.Hosting;
 @using BaSyx.Utils.ResultHandling;
@@ -9,22 +11,20 @@
 @using System.Text.Json;
 @using CNCMachineAASDashboard.Shared.Models;
 @using CNCMachineAASDashboard.Client.Pages.AAS;
+@using Newtonsoft.Json;
 
 @inject NavigationManager NavigationManager
-
-@*@if (aas.IdShort == null)
-{
-    <h1> Idshort is null</h1>
-}*@
+@inject ISignalRService signalRservice
 
 
-<h1> @SignalRData.GetType() </h1>
-<h1> @SignalRData </h1>
 
-<h1> @aas?.IdShort Asset Administration Shell Web UI</h1>
+@*<h1> @SignalRData?.GetType() </h1>
+<h1> @SignalRData </h1>*@
 
-<h1> @json.GetType() </h1>
-<h1> @json </h1>
+<h1> @aas?.idShort asset administration shell web ui</h1>
+
+@*<h1> @json?.GetType() </h1>
+<h1> @json </h1>*@
 
 
 @if (aas != null)
@@ -35,7 +35,7 @@
     </div>
 
     
-    @*<div class="card bg-dark mb-3">
+    <div class="card bg-dark mb-3">
         <div class="card-header"><h4 class="text-white">Asset Administration Shell</h4></div>
         <ul class="list-group list-group-flush">
 
@@ -45,11 +45,11 @@
 
         </ul>
     </div>
-*@
+
    
 
-    @*<AssetComponent asset="@aas.asset"></AssetComponent>*@
-    @*<MaintenanceSMComponent submodel="@aas.submodels[2]"/>*@
+    <AssetComponent asset="@aas.asset"></AssetComponent>
+   
 
 }
 else
@@ -68,34 +68,47 @@ else
 
     public bool IsConnected;
 
-    //private AASModel? aas;
-    private AssetAdministrationShell? aas;
-    public object? SignalRData;
+    private AASModel? aas;
+    //private AssetAdministrationShell? aas;
+    public string? SignalRData;
     public dynamic? json;
+
+
     protected override async Task OnInitializedAsync()
 
     {
 
+
         hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/dataSend")).Build();
 
 
-        hubConnection.On<object>("AASdataSend", data =>
+        hubConnection.On<AASModel>("AASdataSend", data =>
         {
 
 
 
-            SignalRData = data;
+            SignalRData = data.ToString();
+
+            Console.WriteLine(SignalRData.GetType());
+
+
+
+
 
 
 
             if(data!= null)
             {
-                json = data.ToString();
-                //aas = data;
-                //aas = JsonSerializer.Deserialize<AASModel>(data.ToString());
-                aas =JsonSerializer.Deserialize<AssetAdministrationShell>(data.ToString());
-                //aas = JsonConvert.DeserializeObject<AssetAdministrationShell>(data.ToString());
+                //var reslt = System.Text.Json.JsonSerializer.Deserialize<AASModel>(data?.ToString());
+                // Console.WriteLine(reslt?.idShort);
+
+                aas = data;
                 
+
+               // var Deserialize = JsonSerializer.Deserialize<AssetAdministrationShell>(SignalRData);
+                //var Deserialize =JsonSerializer.Deserialize<AssetAdministrationShell>(data.ToString());
+                //aas = JsonConvert.DeserializeObject<IAssetAdministrationShell>(data);
+               // aas = Deserialize;
 
             }
             else{ json = "Sorry this is null"; }
@@ -106,9 +119,14 @@ else
 
         IsConnected = hubConnection.State == HubConnectionState.Connected ? true : false;
         StateHasChanged();
-
+        
     }
-
+    //var aasdata = signalRservice.AASSerializedData;
+    //var Deserialize = JsonSerializer.Deserialize<AASModel>(aasdata);
+    //aas = Deserialize;
+    //StateHasChanged();
+    //await signalRservice.StartConnection();
+    //StateHasChanged();
   
 }
 

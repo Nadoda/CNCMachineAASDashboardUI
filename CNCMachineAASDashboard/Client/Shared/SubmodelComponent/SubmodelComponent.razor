@@ -3,6 +3,7 @@
 @using System.Security.Cryptography;
 @using System.Text;
 @using System.Text.RegularExpressions;
+@using CNCMachineAASDashboard.Shared.Models.MaintenanceSubmodel;
 @using Radzen.Blazor
 @using System.Globalization
 
@@ -17,12 +18,12 @@
         </div>
         <div>
 
-            <ul class="list-group list-group-flush">
+           @* <ul class="list-group list-group-flush">
                 <IdshortComponent _Idshort="@_submodel.idShort"></IdshortComponent>
                 <IdentificationComponent _Identification="@_submodel.identification"></IdentificationComponent>
                 <DescriptionComponent _Description="@_submodel.description"></DescriptionComponent>
                 <SimanticIdComponent _SemanticId="@_submodel.semanticId"></SimanticIdComponent>
-            </ul>
+            </ul>*@
             <div class="card-body">
                 @if (_submodel.submodelElements !=null)
                 {
@@ -62,7 +63,7 @@
                                                 <li class="list-group-item">
                                                     <div class="row align-items-center">
                                                         <div class="col-sm-2"><b>ValueType</b></div>
-                                                        <div class="col-sm-10">@value.valueType</div>
+                                                        @*<div class="col-sm-10">@value.valueType</div>*@
                                                     </div>
                                                 </li>
                                                 <li class="list-group-item">
@@ -84,7 +85,7 @@
 
                                                             </RadzenChart>
                                                             
-                                                            <div class="col-sm-2">@value.value</div>
+                                                           @* <div class="col-sm-2">@value.Value</div>*@
                                                             
                                                         }
                                                         
@@ -120,7 +121,7 @@
     [Parameter]
     public string? _name { get; set; }
     [Parameter]
-    public Submodel? _submodel{ get; set; }
+    public MaintenanceSubmodel? _submodel{ get; set; }
 
     private string? hashedRequestPath{ get; set; }
 

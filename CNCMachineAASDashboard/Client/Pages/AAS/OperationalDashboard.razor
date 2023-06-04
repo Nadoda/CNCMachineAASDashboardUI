@@ -1,16 +1,18 @@
 ﻿@page "/OperationalData";
+@using CNCMachineAASDashboard.Shared.Models.OperationalSubmodel;
 @using Microsoft.AspNetCore.SignalR.Client;
-@using CNCMachineAASDashboard.Shared.Models;
+
 @using CNCMachineAASDashboard.Client.Shared.SubmodelComponent;
 @*@using BaSyx.Models.Core.AssetAdministrationShell.Implementations;*@
 @using System.Security.Cryptography;
 @using System.Text.RegularExpressions;
 @using System.Text;
+
 @inject NavigationManager NavigationManager;
 
 
 
- <SubmodelComponent _name="Operational Data" _submodel="@submodel"></SubmodelComponent>
+@* <SubmodelComponent _name="Operational Data" _submodel="@_submodel"></SubmodelComponent>*@
 
 
 
@@ -18,7 +20,7 @@
     private HubConnection? hubConnection;
     public bool IsConnected;
 
-    public Submodel? submodel;
+    public OperationalSubmodel? _submodel;
 
     public object? SignalRData;
 
@@ -33,7 +35,7 @@
         hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/dataSend")).Build();
 
 
-        hubConnection.On<Submodel>("OperationaldataSend", data =>
+        hubConnection.On<OperationalSubmodel>("OperationaldataSend", data =>
         {
 
             SignalRData = data;
@@ -41,7 +43,7 @@
             if (data != null)
             {
 
-                submodel = data;
+                _submodel = data;
                 
 
             }

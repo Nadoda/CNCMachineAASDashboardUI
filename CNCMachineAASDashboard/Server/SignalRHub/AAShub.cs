@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using CNCMachineAASDashboard.Shared.Models;
 using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
+using BaSyx.Models.Core.AssetAdministrationShell.Generics;
+using BaSyx.Utils.ResultHandling;
+
 namespace CNCMachineAASDashboard.Server.SignalRHub
 {
     public class AAShub:Hub

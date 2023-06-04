@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace CNCMachineAASDashboard.Shared.Models
 {
-    public class SubmodelsRoot
+    public class submodelEement
     {
-        public List<Submodel>? submodels { get; set; }
+        public string? idShort { get; set; }
+        public ModelType? modelType { get; set; }
+        public List<ValueItem>? value { get; set; }
     }
 }

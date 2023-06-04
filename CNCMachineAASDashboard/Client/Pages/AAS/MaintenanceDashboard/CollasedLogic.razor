@@ -1,0 +1,108 @@
+﻿@using BaSyx.AAS.Client.Http;
+@using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
+@using BaSyx.Models.Core.Common;
+@using CNCMachineAASDashboard.Shared.Models.MaintenanceSubmodel;
+@using System.Text.Json;
+@using CNCMachineAASDashboard.Shared.Models;
+<div class="card border-info mb-3">
+
+  <button class="card-header" type="button" @onclick="ToggleMenu" style="background:#005691"><h4 class="text-white">@_valueItem?.idShort</h4></button>
+                       
+    @if (isMenuOpen == true)
+    {
+        <div class="card-body">
+
+
+            @foreach (var item in _valueItem?.value)
+            {
+                
+               
+                <div class="card border-dark mb-3">
+                   
+                    <div class="collapsed">
+                        @if (item?.modelType?.name == "Property" || item?.modelType?.name == "BasicEvent")
+                        {
+                             <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <div class="row align-items-center">
+                                       @item.idShort
+                                    </div>
+                                </li>
+                                <li class="list-group-item">
+                                    <div class="row align-items-center">
+                                        <div class="col-sm-2"><b>ValueType</b></div>
+                                        <div class="col-sm-10">@item.valueType</div>
+                                    </div>
+                                </li>
+                                <li class="list-group-item">
+                                    <div class="row align-items-center">
+                                            <div>@item.value</div>
+                                    </div>
+                                </li>
+                                <li class="list-group-item">
+                                    <div class="row align-items-center">
+                                        <input type="text" @bind="@InputValue" />
+                                        <h1>@InputValue</h1>
+                                        @*<button @onclick="@MakeRequest(_se?.idShort,$"{_valueItem?.idShort}/{item.idShort}",new ElementValue((object)InputValue))">Submit</button>*@
+                                    </div>
+                                </li>
+
+                            </ul>
+
+                        }
+                        else if (item?.modelType?.name == "SubmodelElementCollection")
+                        {
+                              
+                            ValueItem1 valueItemObj = new ValueItem1()
+                            {
+                                idShort = item.idShort,
+                                modelType=item.modelType,
+                                value = @Deserialize(item.value.ToString()),
+                            
+                            };
+                            <CollasedLogic _valueItem="valueItemObj"></CollasedLogic>
+                        }
+                        
+                    </div>
+
+                </div>
+
+            }
+           
+        </div>
+    }
+</div>
+                            
+
+
+@code {
+    [Parameter]
+    public ValueItem1? _valueItem { get; set; }
+
+    [Parameter]
+    public CNCMachineAASDashboard.Shared.Models.MaintenanceSubmodel.SubmodelElement? _se { get; set; }
+
+    public List<ValueItem2>? _valueItem2 { get; set; }
+    private string InputValue { get; set; }
+    public AssetAdministrationShellHttpClient clientAAS;
+    public bool isMenuOpen = false;
+    public void ToggleMenu()
+    {
+        isMenuOpen = !isMenuOpen;
+    }
+    public List<ValueItem2> Deserialize(string str)
+    {
+        var Deserialized=JsonSerializer.Deserialize<List<ValueItem2>>(str);
+        return  Deserialized;
+    }
+    protected override void OnInitialized()
+    {
+        AASModel model = new AASModel();
+        clientAAS = new AssetAdministrationShellHttpClient(new Uri(model.ServerEndpoint));
+    }
+    private EventCallback MakeRequest(string submodelId, string seIdShortPath, IValue value)
+    {
+        clientAAS.UpdateSubmodelElementValue(submodelId, seIdShortPath, value);
+        return EventCallback.Empty;
+    }
+}
