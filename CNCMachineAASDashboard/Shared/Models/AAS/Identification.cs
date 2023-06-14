@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CNCMachineAASDashboard.Shared.Models
+namespace CNCMachineAASDashboard.Shared.Models.AAS
 {
     public class Identification
     {

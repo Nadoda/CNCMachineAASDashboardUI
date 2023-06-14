@@ -1,30 +1,111 @@
-﻿@using CNCMachineAASDashboard.Shared.Models
-@using Microsoft.AspNetCore.Html
+﻿@using BaSyx.AAS.Client.Http;
+@using System.Text.Json;
+@using BaSyx.Models.Core.Common;
+@using CNCMachineAASDashboard.Shared.Models.AAS;
 
-@if(_SE?.modelType?.name == "Property")
-{
-    <div class="card-footer">
-        <div class="row align-items-center">
-            <div class="col-sm-8">
-                <input  type="text" class="form-control" placeholder="Value"  />
-            </div>
-            <div class="col-sm-4">
-                <div class="row">
-                    <button >Read</button>
-                    <button>">Write</button>
-                    <button >Clear</button>
+<div class="card border-info mb-3">
+
+    <button class="card-header" type="button" @onclick="ToggleMenu" style="background:#005691"><h4 class="text-white">@_se?.idShort</h4></button>
+
+    @if (isMenuOpen == true)
+    {
+        <div class="card-body">
+
+
+            <div class="card border-dark mb-3">
+
+                <div class="collapsed">
+                    @if (_se?.modelType?.name == "Property" || _se?.modelType?.name == "BasicEvent")
+                    {
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <div class="row align-items-center">
+                                    @_se.idShort
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="row align-items-center">
+                                    <div class="col-sm-2"><b>ValueType</b></div>
+                                    <div class="col-sm-10">@_se.valueType</div>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="row align-items-center">
+                                    <div>@_se.value</div>
+                                </div>
+                            </li>
+                            @* <li class="list-group-item">
+                    <div class="row align-items-center">
+                    @if (item.valueType == "int")
+                    {
+                    <input type="text" @bind="@item.value" />
+                    }
+                    @*<h1>@InputValue</h1>*@
+                            @*<button @onclick="@MakeRequest(_se?.idShort,$"{_valueItem?.idShort}/{item.idShort}",new ElementValue((object)InputValue))">Submit</button>*@
+                            @*</div>*@
+                            @*</li>*@
+
+                        </ul>
+
+                    }
+                    else if (_se?.modelType?.name == "SubmodelElementCollection")
+                    {
+
+                        var valueItemObj = Deserialize(_se.value.ToString());
+                        foreach (var item in valueItemObj)
+                        {
+                            <SMEcomponent _se="item"></SMEcomponent>
+                        }
+
+                    }
+
                 </div>
+
             </div>
+
+
+
         </div>
-    </div>
-}
-else if (_SE?.modelType?.name == "SubmodelElementCollection")
-{
-    
-}
+    }
+</div>
+
 
 
 @code {
+    //[Parameter]
+    //public ValueItem? _valueItem { get; set; }
+
     [Parameter]
-    public submodelEement? _SE { get; set; }
+    public SubmodelElement? _se { get; set; }
+
+
+    private string InputValue { get; set; }
+    public AssetAdministrationShellHttpClient clientAAS;
+    public bool isMenuOpen = false;
+    public enum DataType
+    {
+        String,
+        Number,
+        Boolean,
+        DateTime
+    }
+    public void ToggleMenu()
+    {
+        isMenuOpen = !isMenuOpen;
+    }
+    public List<SubmodelElement> Deserialize(string str)
+    {
+        var Deserialized = JsonSerializer.Deserialize<List<SubmodelElement>>(str);
+        return Deserialized;
+    }
+    protected override void OnInitialized()
+    {
+        AASModel model = new AASModel();
+        clientAAS = new AssetAdministrationShellHttpClient(new Uri(model.ServerEndpoint));
+    }
+    private EventCallback MakeRequest(string submodelId, string seIdShortPath, IValue value)
+    {
+        clientAAS.UpdateSubmodelElementValue(submodelId, seIdShortPath, value);
+        return EventCallback.Empty;
+    }
 }

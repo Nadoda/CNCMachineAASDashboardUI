@@ -6,19 +6,17 @@ using BaSyx.AAS.Client.Http;
 using BaSyx.Models.Extensions;
 using BaSyx.Models.Core.AssetAdministrationShell.Generics;
 using BaSyx.Utils.ResultHandling;
-using CNCMachineAASDashboard.Shared.Models;
 using System.Text.Json;
 
 using System;
-using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
+
 
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using BaSyx.Models.Core.Common;
-using CNCMachineAASDashboard.Shared.Models.MaintenanceSubmodel;
-using CNCMachineAASDashboard.Shared.Models.OperationalSubmodel;
 
-using CNCMachineAASDashboard.Shared.Models.Test;
+
+using CNCMachineAASDashboard.Shared.Models.AAS;
 //using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
 //using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
 
@@ -27,23 +25,26 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
 {
     public class BackgroundProcess:BackgroundService
     {
-        //  private readonly HttpClient _httpClient;
+         
 
 
         private readonly ILogger<BackgroundProcess> _logger;
         private readonly IHubContext<AAShub> _hubContext;
-             
 
+        private static AssetAdministrationShellHttpClient clientAAS;
 
         public BackgroundProcess(ILogger<BackgroundProcess> logger,IHubContext<AAShub> hubContext )
         {
             
-
+            
             _logger = logger;
 
             _hubContext = hubContext;
 
-                
+            AASModel _model = new AASModel();
+
+            clientAAS = new AssetAdministrationShellHttpClient(new Uri(_model.ServerEndpoint));
+
         }
         
         protected async override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -53,11 +54,7 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
 
                 try
                 {
-                    AASModel _model = new AASModel();
-                    AssetAdministrationShellHttpClient clientAAS = new AssetAdministrationShellHttpClient(new Uri(_model.ServerEndpoint));
-                    //AssetAdministrationShellHttpClient clientAAS = new AssetAdministrationShellHttpClient(new Uri("  http://192.168.184.206:5180"));
-
-                    
+                   
                     IResult<IAssetAdministrationShell> result = clientAAS.RetrieveAssetAdministrationShell();
                     Console.WriteLine(result.Entity.GetType());
                     if (result == null)
@@ -92,10 +89,9 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
                     //var Submodels = clientAAS.RetrieveSubmodels();
                     //string jsonSM = JsonConvert.SerializeObject(Submodels.Entity);
                     //var Jsonobj = JsonConvert.DeserializeObject<object>(jsonSM);
-                    
+
                     //Console.WriteLine(Jsonobj);
-
-
+                   
 
 
                     var MaintenanceSM = clientAAS.RetrieveSubmodel("MaintenanceSubmodel");
@@ -111,7 +107,7 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
                     {
                         var Data = MaintenanceSM.Entity.ToJson();
                         Console.WriteLine(Data);
-                        var MaintenanceData = System.Text.Json.JsonSerializer.Deserialize<MaintenanceSubmodel>(Data);
+                        var MaintenanceData = System.Text.Json.JsonSerializer.Deserialize<Submodel>(Data);
                         await _hubContext.Clients.All.SendAsync("MaintenancedataSend", MaintenanceData);
                         Console.WriteLine($"{MaintenanceSM.Entity.IdShort} dataSent to hub");
                         //Console.WriteLine(Data);
@@ -135,7 +131,7 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
                     else
                     {
                         var Data = OperationalSM.Entity.ToJson();
-                        var OperationalData = System.Text.Json.JsonSerializer.Deserialize<OperationalSubmodel>(Data);
+                        var OperationalData = System.Text.Json.JsonSerializer.Deserialize<Submodel>(Data);
                         await _hubContext.Clients.All.SendAsync("OperationaldataSend", OperationalData);
                         Console.WriteLine($"{OperationalSM.Entity.IdShort} dataSent to hub");
                         //Console.WriteLine(Data);
@@ -149,8 +145,9 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
                     Console.WriteLine("Disconnected");
                     ex.ToString();
                     await Task.Delay(1000);
+                    
                 }
-
+                
 
             }
 

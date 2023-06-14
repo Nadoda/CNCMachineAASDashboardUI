@@ -1,11 +1,10 @@
 ﻿@page "/MaintainanceDashboard";
-@using CNCMachineAASDashboard.Shared.Models;
-@*@using BaSyx.Models.Core.AssetAdministrationShell.Implementations;*@
-@using CNCMachineAASDashboard.Shared.Models.MaintenanceSubmodel;
+
 @using Microsoft.AspNetCore.SignalR.Client;
 @using System.Security.Cryptography;
 @using System.Text.RegularExpressions;
 @using System.Text;
+@using CNCMachineAASDashboard.Shared.Models.AAS;
 @inject NavigationManager NavigationManager;
 
 <PageTitle>Maintenance Dashboard</PageTitle>
@@ -45,7 +44,12 @@
                         <div class="card bg-dark mb-3">
                             <div class="card-header"><h4 class="text-white">@se.idShort</h4></div>
 
-
+                            <SMEcomponent  _se="@se"></SMEcomponent>
+                            @*
+                            @if (se?.modelType?.name == "Property" || se?.modelType?.name == "BasicEvent")
+                            {
+                                <CollasedLogic _valueItem="@se.value" _se="@se"></CollasedLogic>
+                            }
 
                             <div class="card-body">
                                 @foreach (var item in se?.value)
@@ -53,7 +57,7 @@
                                     <CollasedLogic _valueItem="@item" _se="@se"></CollasedLogic>
                                 }
 
-                            </div>
+                            </div>*@
 
                         </div>
                            
@@ -79,7 +83,7 @@ else
 
     public bool IsConnected;
     
-    public MaintenanceSubmodel? Submodel;
+    public Submodel? Submodel;
 
     public object? SignalRData;
 
@@ -94,7 +98,7 @@ else
         hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/dataSend")).Build();
 
 
-        hubConnection.On<MaintenanceSubmodel>("MaintenancedataSend", data =>
+        hubConnection.On<Submodel>("MaintenancedataSend", data =>
         {
 
             SignalRData = data;

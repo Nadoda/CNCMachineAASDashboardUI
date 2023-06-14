@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static CNCMachineAASDashboard.Shared.Models.AASModel;
+using static CNCMachineAASDashboard.Shared.Models.AAS.AASModel;
 
-namespace CNCMachineAASDashboard.Shared.Models
+namespace CNCMachineAASDashboard.Shared.Models.AAS
 {
     public class Asset
     {

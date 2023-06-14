@@ -1,4 +1,7 @@
-﻿@using CNCMachineAASDashboard.Shared.Models;
+﻿@using CNCMachineAASDashboard.Shared.Models.AAS;
+@using CNCMachineAASDashboard.Client.Services; 
+@inject NavigationManager NavigationManager
+@inject IJSRuntime jSRuntime
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -18,7 +21,7 @@
         </div>
         <div class="nav-item px-3">
 
-            <NavLink class="nav-link" href=@_model?.ServerEndpoint Match="NavLinkMatch.All">
+            <NavLink class="nav-link" @onclick="OpenNewTab" Match="NavLinkMatch.All">
                 <span  class="oi oi-browser" aria-hidden="true"></span> AAS_Server
 
             </NavLink>
@@ -47,7 +50,13 @@
     }
     protected override void OnInitialized()
     {
-         _model = new AASModel();
+        _model = new AASModel();
+    }
+    private async Task OpenNewTab()
+    {
+        string? url = _model?.ServerEndpoint; 
+
+        await NavigationManager.NavigationTonewWindow(jSRuntime,url,"Redirecting to AAS Server");
     }
     
 }
