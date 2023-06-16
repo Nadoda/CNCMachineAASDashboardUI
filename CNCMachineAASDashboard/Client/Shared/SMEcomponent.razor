@@ -100,8 +100,8 @@
     }
     protected override void OnInitialized()
     {
-        AASModel model = new AASModel();
-        clientAAS = new AssetAdministrationShellHttpClient(new Uri(model.ServerEndpoint));
+        //AASModel model = new AASModel();
+        //clientAAS = new AssetAdministrationShellHttpClient(new Uri(model.ServerEndpoint));
     }
     private EventCallback MakeRequest(string submodelId, string seIdShortPath, IValue value)
     {

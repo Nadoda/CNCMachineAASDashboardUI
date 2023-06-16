@@ -1,13 +1,9 @@
-﻿@page "/MaintenanceDashboard";
-
-@using Microsoft.AspNetCore.SignalR.Client;
-@using System.Security.Cryptography;
-@using System.Text.RegularExpressions;
-@using System.Text;
+﻿@page "/MaintenanceUI";
 @using CNCMachineAASDashboard.Shared.Models.AAS;
+@using Microsoft.AspNetCore.SignalR.Client;
 @inject NavigationManager NavigationManager;
 
-<PageTitle>Maintenance Dashboard</PageTitle>
+<PageTitle>Maintenance UI</PageTitle>
 
 @*<h1>@Submodel?.idShort</h1>*@
 
@@ -28,44 +24,31 @@
                 <DescriptionComponent _Description="@Submodel?.description"></DescriptionComponent>
                 <SimanticIdComponent _SemanticId="@Submodel?.semanticId"></SimanticIdComponent>
             </ul>
-            
+
         </div>
     </div>
-    
+
 
 
     <div class="container-fluid">
 
-            <div class="row">
-                @foreach (var se in Submodel.submodelElements)
-                {
-                    <div class="col-md-6">
-                        <div class="grid-item">
+        <div class="row">
+            @foreach (var se in Submodel.submodelElements)
+            {
+                <div class="col-md-6">
+                    <div class="grid-item">
                         <div class="card bg-dark mb-3">
                             <div class="card-header"><h4 class="text-white">@se.idShort</h4></div>
 
-                            <SMEcomponent  _se="@se"></SMEcomponent>
-                            @*
-                            @if (se?.modelType?.name == "Property" || se?.modelType?.name == "BasicEvent")
-                            {
-                                <CollasedLogic _valueItem="@se.value" _se="@se"></CollasedLogic>
-                            }
-
-                            <div class="card-body">
-                                @foreach (var item in se?.value)
-                                {
-                                    <CollasedLogic _valueItem="@item" _se="@se"></CollasedLogic>
-                                }
-
-                            </div>*@
+                            <SMEcomponent _se="@se"></SMEcomponent>
 
                         </div>
-                           
-                        </div>
+
                     </div>
-                }
-            </div>
-            
+                </div>
+            }
+        </div>
+
     </div>
 }
 else
@@ -74,15 +57,11 @@ else
     <h1>Check your SignalR status</h1>
 }
 
-
-
-
 @code {
-    
     private HubConnection? hubConnection;
 
     public bool IsConnected;
-    
+
     public Submodel? Submodel;
 
     public object? SignalRData;
@@ -118,6 +97,4 @@ else
         StateHasChanged();
 
     }
-  
-
 }

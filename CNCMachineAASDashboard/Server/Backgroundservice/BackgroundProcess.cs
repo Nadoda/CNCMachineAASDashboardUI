@@ -32,7 +32,7 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
         private readonly IHubContext<AAShub> _hubContext;
 
         private static AssetAdministrationShellHttpClient clientAAS;
-
+        private string? ServerEndpoint = Environment.GetEnvironmentVariable("ASPNETCORE_APIURL");
         public BackgroundProcess(ILogger<BackgroundProcess> logger,IHubContext<AAShub> hubContext )
         {
             
@@ -40,10 +40,8 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
             _logger = logger;
 
             _hubContext = hubContext;
-
-            AASModel _model = new AASModel();
-
-            clientAAS = new AssetAdministrationShellHttpClient(new Uri(_model.ServerEndpoint));
+                       
+            clientAAS = new AssetAdministrationShellHttpClient(new Uri(ServerEndpoint));
 
         }
         

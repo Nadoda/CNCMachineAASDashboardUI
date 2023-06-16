@@ -15,7 +15,9 @@
         "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
         "applicationUrl": "https://localhost:7251;http://localhost:5187",
         "environmentVariables": {
-          "ASPNETCORE_ENVIRONMENT": "Development"
+          "ASPNETCORE_ENVIRONMENT": "Development",
+          "ASPNETCORE_APIURL": "http://192.168.2.186:5180"
+          //"ASPNETCORE_APIURL": "http://141.44.237.156:5180"
         }
       },
       "IIS Express": {

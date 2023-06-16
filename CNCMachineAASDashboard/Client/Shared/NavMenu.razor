@@ -27,8 +27,13 @@
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="MaintainanceDashboard" Match="NavLinkMatch.All">
-                <span class="oi oi-dashboard" aria-hidden="true"></span> MaintainanceDashboard
+            <NavLink class="nav-link" href="MaintenanceUI" Match="NavLinkMatch.All">
+                <span class="oi oi-dashboard" aria-hidden="true"></span> MaintenanceUI
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="MaintenanceDashboard" Match="NavLinkMatch.All">
+                <span class="oi oi-dashboard" aria-hidden="true"></span> MaintenanceDashboard
             </NavLink>
         </div>
         <div class="nav-item px-3">
@@ -43,18 +48,16 @@
     private bool collapseNavMenu = true;
     private AASModel? _model;
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private string? url = "http://192.168.2.186:5180";
 
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
     }
-    protected override void OnInitialized()
-    {
-        _model = new AASModel();
-    }
+  
     private async Task OpenNewTab()
     {
-        string? url = _model?.ServerEndpoint; 
+         
 
         await NavigationManager.NavigationTonewWindow(jSRuntime,url,"Redirecting to AAS Server");
     }
