@@ -1,59 +1,62 @@
 ﻿@page "/OperationalData";
 
-@using Microsoft.AspNetCore.SignalR.Client;
-@using System.Security.Cryptography;
-@using System.Text.RegularExpressions;
-@using System.Text;
 @using CNCMachineAASDashboard.Shared.Models.AAS;
+@using CNCMachineAASDashboard.Client.Services;
 
-@inject NavigationManager NavigationManager;
+@inject ISignalRService SignalRService;
 
+@if(_submodel != null)
+{
+    <div class="card border-success mb-3">
+        <div class="card-header bg-success">
+            <h4 class="text-white">
+                @_submodel.idShort
+                @*<a class="text-white">@Submodel.idShort Dashboard</a>*@
+            </h4>
+        </div>
+        <div>
 
-<div class="card border-success mb-3">
-    <div class="card-header bg-success">
-        <h4>
-            <div class="card-header"><h4 class="text-white">@_submodel.idShort</h4></div>
-            @*<a class="text-white">@Submodel.idShort Dashboard</a>*@
-        </h4>
-    </div>
-    <div>
+            <ul class="list-group list-group-flush">
+                <IdshortComponent _Idshort="@_submodel?.idShort"></IdshortComponent>
+                <IdentificationComponent _Identification="@_submodel?.identification"></IdentificationComponent>
+                <DescriptionComponent _Description="@_submodel?.description"></DescriptionComponent>
+                <SimanticIdComponent _SemanticId="@_submodel?.semanticId"></SimanticIdComponent>
+            </ul>
 
-        <ul class="list-group list-group-flush">
-            <IdshortComponent _Idshort="@_submodel?.idShort"></IdshortComponent>
-            <IdentificationComponent _Identification="@_submodel?.identification"></IdentificationComponent>
-            <DescriptionComponent _Description="@_submodel?.description"></DescriptionComponent>
-            <SimanticIdComponent _SemanticId="@_submodel?.semanticId"></SimanticIdComponent>
-        </ul>
-
-    </div>
-    <div class="container-fluid">
-
-        @foreach (var se in _submodel.submodelElements)
+        </div>
+        @if (_submodel?.submodelElements != null)
         {
-            
-               <div class="card-body">
+            <div class="container-fluid">
 
+                @foreach (var se in _submodel.submodelElements)
+                {
 
-                 <SMEcomponent _se="@se"></SMEcomponent>
+                    <div class="card-body">
 
+                        <SMEcomponent _se="@se"></SMEcomponent>
 
-               </div>
+                    </div>
 
+                }
+
+            </div>
         }
-
+       
     </div>
-</div>
+}
+else
+{
+    <h1>Sorry! There is nothing at this Page</h1>
+    <h1>Check your SignalR status</h1>
+}
+
 
   
 
 
 @code {
-    private HubConnection? hubConnection;
-    public bool IsConnected;
-
+    
     public Submodel? _submodel;
-
-    public object? SignalRData;
 
     private List<object>? temperature { get; set; }
 
@@ -62,29 +65,15 @@
     protected override async Task OnInitializedAsync()
 
     {
-
-        hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/dataSend")).Build();
-
-
-        hubConnection.On<Submodel>("OperationaldataSend", data =>
-        {
-
-            SignalRData = data;
-
-            if (data != null)
-            {
-
-                _submodel = data;
-                
-
-            }
-
-            StateHasChanged();
-        });
-        await hubConnection.StartAsync();
-
-        IsConnected = hubConnection.State == HubConnectionState.Connected ? true : false;
+        SignalRService.OnReceivedOperational += HandleMessageReceived;
+        await SignalRService.StartConnection();
+        
+    }
+    private void HandleMessageReceived(Submodel data)
+    {
+       
+        _submodel = data;
+       
         StateHasChanged();
-
     }
 }

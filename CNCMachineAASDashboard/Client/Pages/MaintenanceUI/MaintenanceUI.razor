@@ -1,18 +1,19 @@
 ﻿@page "/MaintenanceUI";
 @using CNCMachineAASDashboard.Shared.Models.AAS;
-@using Microsoft.AspNetCore.SignalR.Client;
-@inject NavigationManager NavigationManager;
+@using CNCMachineAASDashboard.Client.Services;
+
+@inject ISignalRService SignalRService;
 
 <PageTitle>Maintenance UI</PageTitle>
 
-@*<h1>@Submodel?.idShort</h1>*@
+
 
 @if (Submodel != null)
 {
     <div class="card border-success mb-3">
         <div class="card-header bg-success">
-            <h4>
-                <div class="card-header"><h4 class="text-white">@Submodel.idShort</h4></div>
+            <h4 class="text-white">
+                @Submodel.idShort
                 @*<a class="text-white">@Submodel.idShort Dashboard</a>*@
             </h4>
         </div>
@@ -28,28 +29,31 @@
         </div>
     </div>
 
+    @if(Submodel?.submodelElements != null)
+    {
+        <div class="container-fluid">
 
+            <div class="row">
+                @foreach (var se in Submodel.submodelElements)
+                {
+                    <div class="col-md-6">
+                        <div class="grid-item">
+                            <div class="card bg-dark mb-3">
+                                <div class="card-header"><h4 class="text-white">@se.idShort</h4></div>
 
-    <div class="container-fluid">
+                                <SMEcomponent _se="@se"></SMEcomponent>
 
-        <div class="row">
-            @foreach (var se in Submodel.submodelElements)
-            {
-                <div class="col-md-6">
-                    <div class="grid-item">
-                        <div class="card bg-dark mb-3">
-                            <div class="card-header"><h4 class="text-white">@se.idShort</h4></div>
-
-                            <SMEcomponent _se="@se"></SMEcomponent>
+                            </div>
 
                         </div>
-
                     </div>
-                </div>
-            }
-        </div>
+                }
+            </div>
 
-    </div>
+        </div>
+    }
+
+    
 }
 else
 {
@@ -58,43 +62,20 @@ else
 }
 
 @code {
-    private HubConnection? hubConnection;
-
-    public bool IsConnected;
-
+    
     public Submodel? Submodel;
-
-    public object? SignalRData;
-
-
-
 
 
     protected override async Task OnInitializedAsync()
-
     {
-
-        hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/dataSend")).Build();
-
-
-        hubConnection.On<Submodel>("MaintenancedataSend", data =>
-        {
-
-            SignalRData = data;
-
-            if (data != null)
-            {
-
-                Submodel = data;
-
-            }
-
-            StateHasChanged();
-        });
-        await hubConnection.StartAsync();
-
-        IsConnected = hubConnection.State == HubConnectionState.Connected ? true : false;
+        SignalRService.OnReceivedMaintenance += HandleMessageReceived;
+        await SignalRService.StartConnection();
+        
+    }
+    private void HandleMessageReceived(Submodel data)
+    {    
+        Submodel = data;
+      
         StateHasChanged();
-
     }
 }

@@ -1,23 +1,21 @@
 ﻿@page "/MaintenanceDashboard";
 
 @using Microsoft.AspNetCore.SignalR.Client;
-@using System.Security.Cryptography;
-@using System.Text.RegularExpressions;
-@using System.Text;
 @using CNCMachineAASDashboard.Shared.Models.AAS;
-@inject NavigationManager NavigationManager;
+@using CNCMachineAASDashboard.Client.Services;
 
+@inject NavigationManager NavigationManager;
+@inject ISignalRService SignalRService;
 <PageTitle>Maintenance Dashboard</PageTitle>
 
-@*<h1>@Submodel?.idShort</h1>*@
+<h1>An Issue while incrementing the OH with Timer instead Delay</h1>
 
 @if (Submodel != null)
 {
     <div class="card border-success mb-3">
         <div class="card-header bg-success">
-            <h4>
-                <div class="card-header"><h4 class="text-white">@Submodel.idShort</h4></div>
-                @*<a class="text-white">@Submodel.idShort Dashboard</a>*@
+            <h4 class="text-white">
+                @Submodel.idShort
             </h4>
         </div>
         <div>
@@ -31,42 +29,32 @@
             
         </div>
     </div>
-    
 
 
-    <div class="container-fluid">
+    @if (Submodel?.submodelElements != null)
+    {
+        <div class="container-fluid">
 
             <div class="row">
                 @foreach (var se in Submodel.submodelElements)
                 {
                     <div class="col-md-6">
                         <div class="grid-item">
-                        <div class="card bg-dark mb-3">
-                            <div class="card-header"><h4 class="text-white">@se.idShort</h4></div>
+                            <div class="card bg-dark mb-3">
+                                <div class="card-header"><h4 class="text-white">@se.idShort</h4></div>
 
-                            <SMEcomponent  _se="@se"></SMEcomponent>
-                            @*
-                            @if (se?.modelType?.name == "Property" || se?.modelType?.name == "BasicEvent")
-                            {
-                                <CollasedLogic _valueItem="@se.value" _se="@se"></CollasedLogic>
-                            }
+                                <SMEcomponent _se="@se"></SMEcomponent>
+                                
+                            </div>
 
-                            <div class="card-body">
-                                @foreach (var item in se?.value)
-                                {
-                                    <CollasedLogic _valueItem="@item" _se="@se"></CollasedLogic>
-                                }
-
-                            </div>*@
-
-                        </div>
-                           
                         </div>
                     </div>
                 }
             </div>
-            
-    </div>
+
+        </div>
+    }
+    
 }
 else
 {
@@ -78,10 +66,12 @@ else
 
 
 @code {
-    
-    private HubConnection? hubConnection;
 
-    public bool IsConnected;
+    //[Inject]
+    //private ISignalRService SignalRService { get; set; }
+    //private HubConnection? hubConnection;
+
+    //public bool IsConnected;
     
     public Submodel? Submodel;
 
@@ -92,32 +82,41 @@ else
 
 
     protected override async Task OnInitializedAsync()
-
     {
+        SignalRService.OnReceivedMaintenance += HandleMessageReceived;
+        await SignalRService.StartConnection();
 
-        hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/dataSend")).Build();
+
+        //hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/dataSend")).Build();
 
 
-        hubConnection.On<Submodel>("MaintenancedataSend", data =>
-        {
+        //hubConnection.On<Submodel>("MaintenancedataSend", data =>
+        //{
 
-            SignalRData = data;
+        //    SignalRData = data;
 
-            if (data != null)
-            {
+        //    if (data != null)
+        //    {
 
-                Submodel = data;
+        //        Submodel = data;
 
-            }
+        //    }
 
-            StateHasChanged();
-        });
-        await hubConnection.StartAsync();
+        //    StateHasChanged();
+        //});
+        //await hubConnection.StartAsync();
 
-        IsConnected = hubConnection.State == HubConnectionState.Connected ? true : false;
-        StateHasChanged();
+        //IsConnected = hubConnection.State == HubConnectionState.Connected ? true : false;
+        //StateHasChanged();
 
     }
-  
+    private void HandleMessageReceived(Submodel data)
+    {
+        SignalRData = data.ToString();
+
+        Submodel = data;
+
+        StateHasChanged();
+    }
 
 }

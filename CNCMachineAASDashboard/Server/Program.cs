@@ -43,6 +43,11 @@ app.UseRouting();
 app.MapRazorPages();
 app.MapControllers();
 app.MapHub<AAShub>("/dataSend");
+//app.UseEndpoints(endpoints =>
+//{
+//    endpoints.MapHub<ConnectionAPI>("/Connection");
+
+//});
 app.MapFallbackToFile("index.html");
 
 app.Run();

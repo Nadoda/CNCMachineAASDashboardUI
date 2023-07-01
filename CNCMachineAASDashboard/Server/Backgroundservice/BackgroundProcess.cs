@@ -17,7 +17,10 @@ using BaSyx.Models.Core.Common;
 
 
 using CNCMachineAASDashboard.Shared.Models.AAS;
-//using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
+using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
+using Submodel = CNCMachineAASDashboard.Shared.Models.AAS.Submodel;
+using System.Runtime.Serialization.Formatters.Binary;
+
 //using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
 
 
@@ -58,7 +61,7 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
                     if (result == null)
                     {   
                         Console.WriteLine("AAS data not received");
-                        Console.WriteLine(result.GetType());
+                        Console.WriteLine(result?.GetType());
                     }
                     //var a = result.Entity[]
                     else 
@@ -70,7 +73,7 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
                        // string jsonSerialized = JsonConvert.SerializeObject(AASGetData);
                         //Console.WriteLine(jsonSerialized);
 
-                        var obj = System.Text.Json.JsonSerializer.Deserialize<AASModel>(AASGetData);
+                        var obj = JsonConvert.DeserializeObject<AASModel>(AASGetData);
                         //Console.WriteLine(obj);
 
                         //   var data = result.Entity.ToJson();
@@ -84,16 +87,26 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
                         //Console.WriteLine(data);
                     };
 
-                    //var Submodels = clientAAS.RetrieveSubmodels();
-                    //string jsonSM = JsonConvert.SerializeObject(Submodels.Entity);
-                    //var Jsonobj = JsonConvert.DeserializeObject<object>(jsonSM);
-
-                    //Console.WriteLine(Jsonobj);
+                  
                    
 
 
                     var MaintenanceSM = clientAAS.RetrieveSubmodel("MaintenanceSubmodel");
-                    //IElementContainer<ISubmodelElement> SEs = MaintenanceSM.Entity.SubmodelElements; 
+                    
+                    //IElementContainer<ISubmodelElement> SEs = MaintenanceSM.Entity.SubmodelElements;
+                    //var MData = JsonConvert.SerializeObject(MaintenanceSM.Entity);
+
+                    //var MData = MaintenanceSM.Entity.ToJson();
+                    //var MaintenanceData = System.Text.Json.JsonSerializer.Deserialize<BaSyx.Models.Core.AssetAdministrationShell.Implementations.Submodel>(MData);
+                    //var MaintenanceData = JsonConvert.DeserializeObject<BaSyx.Models.Core.AssetAdministrationShell.Implementations.Submodel>(MData);
+
+
+                    // var se = clientAAS.RetrieveSubmodelElement("MaintenanceSubmodel","Maintenance_1");
+                    // var SEd= se.Entity.ToJson();
+                    // //var SEd = JsonConvert.SerializeObject(se.Entity);
+                    // var ata = JsonConvert.DeserializeObject<SubmodelElementCollection>(SEd);
+                    // //var ata = System.Text.Json.JsonSerializer.Deserialize<SubmodelElementCollection>(SEd);
+
 
 
                     if (MaintenanceSM == null)

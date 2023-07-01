@@ -1,37 +1,23 @@
 ﻿@page "/"
-@using BaSyx.AAS.Client.Http;
-@using CNCMachineAASDashboard.Client.Services;
-@using Microsoft.AspNetCore.SignalR.Client
-@using Microsoft.AspNetCore.Hosting;
-@using BaSyx.Utils.ResultHandling;
-@using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
 
-@using System.Text.Json.Nodes;
-@using System.Text.Json;
-@using CNCMachineAASDashboard.Shared.Models;
-@using CNCMachineAASDashboard.Client.Pages;
-@using Newtonsoft.Json;
+@using CNCMachineAASDashboard.Client.Services;
+@using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
 @using CNCMachineAASDashboard.Shared.Models.AAS;
 
-@inject NavigationManager NavigationManager
-@inject ISignalRService signalRservice
+
+@inject ISignalRService SignalRService
 
 
-
-@*<h1> @SignalRData?.GetType() </h1>
-<h1> @SignalRData </h1>*@
 
 <h1> @aas?.idShort asset administration shell web ui</h1>
 
-@*<h1> @json?.GetType() </h1>
-<h1> @json </h1>*@
 
 
 @if (aas != null)
 {
     <div class="starter-template">
     
-    @*<h2>generic ui to discover the asset administration shell</h2>*@
+        @*<h1>SignalR IsConnected: @SignalRService.IsConnected</h1>*@
     </div>
 
     
@@ -49,8 +35,17 @@
    
 
     <AssetComponent asset="@aas.asset"></AssetComponent>
+    <input type="text" @bind="@message" @onkeypress="HandleKeyPress" />
+    <button @onclick="async () => await SignalRService.SendMessage(message) "></button>
+    @if (messageList != null)
+    {
+        @foreach (var item in messageList)
+        {
+            <h1> @item </h1>
+        }
+    }
    
-
+    
 }
 else
 {
@@ -63,70 +58,46 @@ else
 
 @code {
 
-
-    private HubConnection? hubConnection;
-
-    public bool IsConnected;
-
     private AASModel? aas;
     //private AssetAdministrationShell? aas;
-    public string? SignalRData;
-    public dynamic? json;
+    public string? message;
+    public List<string>? messageList;
 
 
     protected override async Task OnInitializedAsync()
+    {
 
+        SignalRService.OnReceivedAAS += HandleMessageReceived;
+        SignalRService.OnReceivedMessage += HandleMessage;
+        await SignalRService.StartConnection();
+        List<string> newList = new List<string>();
+        messageList = newList;
+    }
+    private void HandleMessageReceived(AASModel data)
+    {
+      
+        aas = data;
+
+        StateHasChanged();
+    }
+    private void HandleMessage(string data)
     {
 
 
-        hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/dataSend")).Build();
+        messageList?.Add(data);
 
-
-        hubConnection.On<AASModel>("AASdataSend", data =>
-        {
-
-
-
-            SignalRData = data.ToString();
-
-            Console.WriteLine(SignalRData.GetType());
-
-
-
-
-
-
-
-            if(data!= null)
-            {
-                //var reslt = System.Text.Json.JsonSerializer.Deserialize<AASModel>(data?.ToString());
-                // Console.WriteLine(reslt?.idShort);
-
-                aas = data;
-                
-
-               // var Deserialize = JsonSerializer.Deserialize<AssetAdministrationShell>(SignalRData);
-                //var Deserialize =JsonSerializer.Deserialize<AssetAdministrationShell>(data.ToString());
-                //aas = JsonConvert.DeserializeObject<IAssetAdministrationShell>(data);
-               // aas = Deserialize;
-
-            }
-            else{ json = "Sorry this is null"; }
-
-            StateHasChanged();
-        });
-        await hubConnection.StartAsync();
-
-        IsConnected = hubConnection.State == HubConnectionState.Connected ? true : false;
         StateHasChanged();
-        
     }
-    //var aasdata = signalRservice.AASSerializedData;
-    //var Deserialize = JsonSerializer.Deserialize<AASModel>(aasdata);
-    //aas = Deserialize;
-    //StateHasChanged();
-    //await signalRservice.StartConnection();
-    //StateHasChanged();
+    private async Task HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && message!=null)
+        {
+            await SignalRService.SendMessage(message);
+            // Trigger the desired functionality
+            // You can access the input value using the 'inputValue' property
+            // Add your logic here
+        }
+    }
   
 }
 

@@ -1,0 +1,157 @@
+﻿@page "/SEForm";
+@using CNCMachineAASDashboard.Shared.Models.AAS;
+@using Radzen.Blazor;
+@using Radzen;
+@using System.Text.Json;
+@using System.Text;
+@inject HttpClient HttpClient
+
+@if (se == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <RadzenTemplateForm Data="@se" Submit="@((SubmodelElement args) => { Submit(args); })">
+    <RadzenRow Gap="2rem" Class="rz-p-0 rz-p-lg-4">
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenStack>
+            <RadzenFieldset Text="SubModel Element Info">
+                <RadzenStack  Gap="1rem">
+                <RadzenRow AlignItems="AlignItems.Center">
+                    <RadzenColumn Size="12" SizeMD="4">
+                        <RadzenLabel Text="IdShort" />
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8">
+                        <input type="text"  class="form-control" @bind="@idShort" />
+                        @*<RadzenTextBox @bind="@idShort" AllowClear="true" ></RadzenTextBox>*@
+                        <p>@idShort</p>
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow AlignItems="AlignItems.Center">
+                    <RadzenColumn Size="12" SizeMD="4">
+                        <RadzenLabel Text="ModelType" />
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8">
+                                    <input type="text" class="form-control" @bind="@Model_Type" />
+                        @*<RadzenTextBox @bind="@Model_Type" AllowClear="true"></RadzenTextBox>*@
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow AlignItems="AlignItems.Center">
+                    <RadzenColumn Size="12" SizeMD="4">
+                        <RadzenLabel Text="Value" />
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8">
+                                  <input type="text" class="form-control" @bind="@value" />
+                        @*<RadzenTextBox @bind="@value" AllowClear="true"></RadzenTextBox>*@
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow AlignItems="AlignItems.Center">
+                    <RadzenColumn Size="12" SizeMD="4">
+                        <RadzenLabel Text="ValueType" />
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8">
+                                    <input type="text" class="form-control" @bind="@valueType" />
+                       @*<RadzenTextBox @bind="@valueType" AllowClear="true" ></RadzenTextBox>*@
+                    </RadzenColumn>
+                </RadzenRow>
+                </RadzenStack>
+            
+           
+                
+            </RadzenFieldset>
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" Class="rz-mt-8 rz-mb-4">
+        <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Create or Update" />
+        <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Cancel" Click="@Cancel" />
+    </RadzenStack>
+    </RadzenTemplateForm>
+   
+}
+    <div>
+        <label>IdShort:</label>
+        <input type="text" @bind="@idShort" />
+    </div>
+
+    <div>
+        <label>ModelType:</label>
+        <input type="text" @bind="@Model_Type" />
+    </div>
+  @*  <div>
+        <label>Value:</label>
+        <input type="text" @bind="@value" />
+    </div>*@
+    @*<div>
+        <label>ValueType:</label>
+        <input type="text" @bind="@valueType" />
+    </div>*@
+
+    <button class="btn btn-primary" @onclick="CreateOrUpdate">Submit</button>
+    
+
+
+@code {
+    public string? idShort { get; set; }
+    public string? Model_Type { get; set; }
+    public object? value { get; set; }
+    public string? valueType { get; set; }
+    public SubmodelElement? se;
+   
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    ModelType _modelType = new ModelType()
+    //        {
+    //            name = Model_Type,
+    //        };
+    //    se = new SubmodelElement()
+    //        {
+    //            idShort = idShort,
+    //            modelType = _modelType,
+    //            value = value,
+    //            valueType = valueType
+    //        };
+    //}
+
+    
+   private async Task CreateOrUpdate()
+    {
+        ModelType _modelType = new ModelType()
+            {
+                name = Model_Type,
+            };
+        se = new SubmodelElement()
+            {
+                idShort = idShort,
+                modelType = _modelType,
+                value = value,
+                valueType = valueType
+            };
+        var _SESerialized = JsonSerializer.Serialize(se);
+        var res1 = await HttpClient.PostAsJsonAsync($"http://192.168.2.186:5180/aas/submodels/MaintenanceSubmodel/submodel/submodelElements/{idShort}", se);
+    }
+
+
+
+    void Submit(SubmodelElement _se)
+    {
+        //ModelType _modelType = new ModelType()
+        //    {
+        //        name = Model_Type,
+        //    };
+        //_se = new SubmodelElement()
+        //    {
+        //        idShort = idShort,
+        //        modelType = _modelType,
+        //        value = value,
+        //        valueType = valueType
+        //    };
+        //var _SESerialized = JsonSerializer.Serialize(_se);
+        //var res1 = await HttpClient.PutAsJsonAsync("http://192.168.2.186:5180/aas/submodels/OperationalDataSubmodel/submodel/submodelElements", _SESerialized);
+    }
+    void Cancel()
+    {
+        //
+    }
+}

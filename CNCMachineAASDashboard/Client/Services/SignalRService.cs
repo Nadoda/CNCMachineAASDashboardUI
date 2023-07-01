@@ -1,36 +1,62 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using CNCMachineAASDashboard.Shared.Models.AAS;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
+
 
 namespace CNCMachineAASDashboard.Client.Services
 {
+
     public class SignalRService : ISignalRService
     {
-        public string AASSerializedData { get; private set; }
-        private HubConnection hubConnection;
-        private readonly NavigationManager _navigationManager;
-        public SignalRService(NavigationManager navigationManager) 
+        private static HubConnection hubConnection;
+        private readonly NavigationManager NavigationManager;
+        public bool IsConnected { get { return hubConnection?.State == HubConnectionState.Connected; } }
+
+        public event Action<AASModel>? OnReceivedAAS;
+        public event Action<Submodel>? OnReceivedMaintenance;
+        public event Action<Submodel>? OnReceivedOperational;
+        public event Action<string>? OnReceivedMessage;
+
+        public SignalRService(NavigationManager navigationManager)
         {
-            _navigationManager = navigationManager;
-            hubConnection = new HubConnectionBuilder().WithUrl(_navigationManager.ToAbsoluteUri("/dataSend")).Build();
-            hubConnection.On<string>("AASdataSend", ReceiveData);
+            this.NavigationManager = navigationManager;
+
+            hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/dataSend")).Build();
+
+            hubConnection.On<AASModel>("AASdataSend", data =>
+            {
+
+                OnReceivedAAS?.Invoke(data);
+
+            });
+            hubConnection.On<Submodel>("MaintenancedataSend", data =>
+            {
+
+                OnReceivedMaintenance?.Invoke(data);
+            });
+            hubConnection.On<Submodel>("OperationaldataSend", data =>
+            {
+                OnReceivedOperational?.Invoke(data);
+            });
+
+            hubConnection.On<string>("Message", data =>
+            {
+
+                OnReceivedMessage?.Invoke(data);
+
+            });
+
         }
-
-
-        private void ReceiveData(string serializedData)
-        {
-            AASSerializedData = serializedData;
-        }
-
-
-
         public async Task StartConnection()
         {
+
             await hubConnection.StartAsync();
         }
 
-        public async Task StopConnection()
+        public async Task SendMessage(string message)
         {
-            await hubConnection.StopAsync();
+            await hubConnection.InvokeAsync("SendMessage", message);
         }
     }
+
 }
