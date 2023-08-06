@@ -9,7 +9,7 @@ namespace CNCMachineAASDashboard.Client.Services
         event Action<Submodel>? OnReceivedOperational;
         event Action<string>? OnReceivedMessage;
         bool IsConnected { get; }
-        Task SendMessage(string message);
+        Task UpdateServerValue(string address, string value);
         Task StartConnection();
     }
 }

@@ -17,7 +17,7 @@
         "environmentVariables": {
           "ASPNETCORE_ENVIRONMENT": "Development",
           "ASPNETCORE_APIURL": "http://192.168.2.186:5180"
-          //"ASPNETCORE_APIURL": "http://141.44.237.159:5180"
+          //"ASPNETCORE_APIURL": "http://141.44.237.162:5180"
         }
       },
       "IIS Express": {

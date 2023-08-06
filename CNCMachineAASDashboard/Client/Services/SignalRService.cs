@@ -53,9 +53,9 @@ namespace CNCMachineAASDashboard.Client.Services
             await hubConnection.StartAsync();
         }
 
-        public async Task SendMessage(string message)
+        public async Task UpdateServerValue(string address,string value)
         {
-            await hubConnection.InvokeAsync("SendMessage", message);
+            await hubConnection.InvokeAsync("UpdateToServer", address,value);
         }
     }
 

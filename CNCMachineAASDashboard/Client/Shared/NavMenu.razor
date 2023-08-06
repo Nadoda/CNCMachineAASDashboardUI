@@ -54,17 +54,18 @@
     private bool collapseNavMenu = true;
     private AASModel? _model;
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-    private string url = "http://192.168.2.186:5180";
-    //private string url = "http://141.44.237.159:5180";
+     [Inject]
+    IConfiguration? configuration { get; set; }
+    private string? url;
 
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
     }
-  
+
     private async Task OpenNewTab()
     {
-         
+        url = configuration.GetValue<string>("HelloAAS_API");
         await NavigationManager.NavigationTonewWindow(jSRuntime, url, "Redirecting to AAS Server");
     }
     

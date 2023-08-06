@@ -1,5 +1,6 @@
 ﻿@page "/MaintenanceDashboard";
 
+@using BaSyx.AAS.Client.Http;
 @using Microsoft.AspNetCore.SignalR.Client;
 @using CNCMachineAASDashboard.Shared.Models.AAS;
 @using CNCMachineAASDashboard.Client.Services;
@@ -34,24 +35,12 @@
     @if (Submodel?.submodelElements != null)
     {
         <div class="container-fluid">
-
-            <div class="row">
-                @foreach (var se in Submodel.submodelElements)
-                {
-                    <div class="col-md-6">
-                        <div class="grid-item">
-                            <div class="card bg-dark mb-3">
-                                <div class="card-header"><h4 class="text-white">@se.idShort</h4></div>
-
-                                <SMEcomponent _se="@se"></SMEcomponent>
-                                
-                            </div>
-
-                        </div>
-                    </div>
-                }
-            </div>
-
+            @foreach (var se in Submodel.submodelElements)
+            {
+                <SMEcomponent SubmodelId="@Submodel.idShort" SeIdShortPath="@se.idShort" _se="@se"></SMEcomponent>
+                
+            }
+            
         </div>
     }
     
@@ -77,16 +66,17 @@ else
 
     public object? SignalRData;
 
+    
 
-
-
+  
 
     protected override async Task OnInitializedAsync()
     {
         SignalRService.OnReceivedMaintenance += HandleMessageReceived;
         await SignalRService.StartConnection();
 
-
+        
+        
         //hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/dataSend")).Build();
 
 

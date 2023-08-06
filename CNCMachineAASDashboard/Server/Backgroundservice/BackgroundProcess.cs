@@ -26,9 +26,9 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace CNCMachineAASDashboard.Server.Backgroundservice
 {
-    public class BackgroundProcess:BackgroundService
+    public class BackgroundProcess : BackgroundService
     {
-         
+
 
 
         private readonly ILogger<BackgroundProcess> _logger;
@@ -36,18 +36,18 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
 
         private static AssetAdministrationShellHttpClient clientAAS;
         private string? ServerEndpoint = Environment.GetEnvironmentVariable("ASPNETCORE_APIURL");
-        public BackgroundProcess(ILogger<BackgroundProcess> logger,IHubContext<AAShub> hubContext )
+        public BackgroundProcess(ILogger<BackgroundProcess> logger, IHubContext<AAShub> hubContext)
         {
-            
-            
+
+
             _logger = logger;
 
             _hubContext = hubContext;
-                       
+
             clientAAS = new AssetAdministrationShellHttpClient(new Uri(ServerEndpoint));
 
         }
-        
+
         protected async override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
@@ -55,22 +55,22 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
 
                 try
                 {
-                   
+
                     IResult<IAssetAdministrationShell> result = clientAAS.RetrieveAssetAdministrationShell();
-                    Console.WriteLine(result.Entity.GetType());
+                    //Console.WriteLine(result.Entity.GetType());
                     if (result == null)
-                    {   
+                    {
                         Console.WriteLine("AAS data not received");
                         Console.WriteLine(result?.GetType());
                     }
                     //var a = result.Entity[]
-                    else 
+                    else
                     {
-                       var AASGetData = result.Entity.ToJson();
+                        var AASGetData = result.Entity.ToJson();
                         Console.WriteLine(AASGetData);
 
-                      // Console.WriteLine(AASGetData.Asset.IdShort);
-                       // string jsonSerialized = JsonConvert.SerializeObject(AASGetData);
+                        // Console.WriteLine(AASGetData.Asset.IdShort);
+                        // string jsonSerialized = JsonConvert.SerializeObject(AASGetData);
                         //Console.WriteLine(jsonSerialized);
 
                         var obj = JsonConvert.DeserializeObject<AASModel>(AASGetData);
@@ -82,17 +82,17 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
 
 
                         await _hubContext.Clients.All.SendAsync("AASdataSend", obj);
-                        
+
                         Console.WriteLine($"CNCMAchineAAS dataSent to hub");
                         //Console.WriteLine(data);
                     };
 
-                  
-                   
+
+
 
 
                     var MaintenanceSM = clientAAS.RetrieveSubmodel("MaintenanceSubmodel");
-                    
+
                     //IElementContainer<ISubmodelElement> SEs = MaintenanceSM.Entity.SubmodelElements;
                     //var MData = JsonConvert.SerializeObject(MaintenanceSM.Entity);
 
@@ -133,7 +133,7 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
                         //var obj = System.Text.Json.JsonSerializer.Deserialize<List<ValueItem2>>(mr1.value.ToString());
                     };
                     var OperationalSM = clientAAS.RetrieveSubmodel("OperationalDataSubmodel");
-                    
+
                     if (OperationalSM == null)
                     {
                         Console.WriteLine("Operational data not received");
@@ -156,9 +156,9 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
                     Console.WriteLine("Disconnected");
                     ex.ToString();
                     await Task.Delay(1000);
-                    
+
                 }
-                
+
 
             }
 

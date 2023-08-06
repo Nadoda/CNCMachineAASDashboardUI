@@ -35,8 +35,8 @@
    
 
     <AssetComponent asset="@aas.asset"></AssetComponent>
-    <input type="text" @bind="@message" @onkeypress="HandleKeyPress" />
-    <button @onclick="async () => await SignalRService.SendMessage(message) "></button>
+    @*<input type="text" @bind="@message" @onkeypress="HandleKeyPress" />*@
+    @*<button @onclick="async () => await SignalRService.SendMessage(message) "></button>*@
     @if (messageList != null)
     {
         @foreach (var item in messageList)
@@ -88,16 +88,16 @@ else
 
         StateHasChanged();
     }
-    private async Task HandleKeyPress(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter" && message!=null)
-        {
-            await SignalRService.SendMessage(message);
-            // Trigger the desired functionality
-            // You can access the input value using the 'inputValue' property
-            // Add your logic here
-        }
-    }
+    //private async Task HandleKeyPress(KeyboardEventArgs e)
+    //{
+    //    if (e.Key == "Enter" && message!=null)
+    //    {
+    //        await SignalRService.SendMessage(message);
+    //        // Trigger the desired functionality
+    //        // You can access the input value using the 'inputValue' property
+    //        // Add your logic here
+    //    }
+    //}
   
 }
 

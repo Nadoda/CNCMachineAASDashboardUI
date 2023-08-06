@@ -1,8 +1,11 @@
 
 using BaSyx.AAS.Client.Http;
+using CNCMachineAASDashboard.Client.Services;
 using CNCMachineAASDashboard.Server.Backgroundservice;
+using CNCMachineAASDashboard.Server.ClientToAASServer;
 using CNCMachineAASDashboard.Server.SignalRHub;
 using Microsoft.AspNetCore.ResponseCompression;
+using IClientToAAS_Server = CNCMachineAASDashboard.Server.ClientToAASServer.IClientToAAS_Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +15,12 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddHostedService<BackgroundProcess>();
 
-builder.Services.AddHttpClient();
+//builder.Services.AddHttpClient();
+builder.Services.AddHttpClient<IClientToAAS_Server, AASClient>(client =>
+{
+    var ServerEndpoint = Environment.GetEnvironmentVariable("ASPNETCORE_APIURL");
+    client.BaseAddress = new Uri(ServerEndpoint);
+});
 builder.Services.AddSignalR();
 //builder.Services.AddSingleton<AAShub>();
 //builder.Services.AddSingleton<MaintenanceSMhub>();
