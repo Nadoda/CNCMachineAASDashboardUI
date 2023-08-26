@@ -4,3 +4,8 @@ window.NavigationManagerExtensions.openInNewWindow = (url, message) => {
     newTab.document.write(message);
     newTab.location.href = url;
 } 
+window.updateDateTime = () => {
+    const element = document.getElementById('dateTimeElement');
+    const now = new Date();
+    element.innerText = now.toLocaleString();
+};

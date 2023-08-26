@@ -1,25 +1,20 @@
-﻿@page "/"
+@page "/"
 
+@using BaSyx.Models.Core.AssetAdministrationShell.Generics;
+@using CNCMachineAASDashboard.Client.Pages.MaintenanceUI;
 @using CNCMachineAASDashboard.Client.Services;
 @using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
 @using CNCMachineAASDashboard.Shared.Models.AAS;
+@using Microsoft.AspNetCore.SignalR.Client;
 
 
-@inject ISignalRService SignalRService
 
 
 
-<h1> @aas?.idShort asset administration shell web ui</h1>
-
-
+<RadzenImage Path="Images/Logo.jpg" Style="width: 100%;hight:30px;margin-top:0px; margin-bottom:0px;" />
 
 @if (aas != null)
 {
-    <div class="starter-template">
-    
-        @*<h1>SignalR IsConnected: @SignalRService.IsConnected</h1>*@
-    </div>
-
     
     <div class="card bg-dark mb-3">
         <div class="card-header"><h4 class="text-white">Asset Administration Shell</h4></div>
@@ -59,20 +54,30 @@ else
 @code {
 
     private AASModel? aas;
-    //private AssetAdministrationShell? aas;
     public string? message;
     public List<string>? messageList;
+  
+
+
+    [Inject]
+    private ISignalRService SignalRService { get; set; }
+    private HubConnection? hubConnection;
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+
 
 
     protected override async Task OnInitializedAsync()
     {
-
+        
         SignalRService.OnReceivedAAS += HandleMessageReceived;
         SignalRService.OnReceivedMessage += HandleMessage;
         await SignalRService.StartConnection();
         List<string> newList = new List<string>();
         messageList = newList;
+
     }
+   
     private void HandleMessageReceived(AASModel data)
     {
       
@@ -88,16 +93,8 @@ else
 
         StateHasChanged();
     }
-    //private async Task HandleKeyPress(KeyboardEventArgs e)
-    //{
-    //    if (e.Key == "Enter" && message!=null)
-    //    {
-    //        await SignalRService.SendMessage(message);
-    //        // Trigger the desired functionality
-    //        // You can access the input value using the 'inputValue' property
-    //        // Add your logic here
-    //    }
-    //}
+   
+   
   
 }
 

@@ -7,13 +7,14 @@
 @using CNCMachineAASDashboard.Client.Services;
 @using CNCMachineAASDashboard.Shared.Models.AAS;
 @using System.Text;
-
+@using System.Drawing;
 
 
 
 <div class="card border-info mb-3">
 
-    <button class="card-header" type="button" @onclick="ToggleMenu" style="background:#005691"><h4 class="text-white">@_se?.idShort</h4></button>
+    <button class="card-header" type="button" style="background:@color" @onclick="ToggleMenu">@_se.idShort</button>
+    
 
     @if (isMenuOpen == true)
     {
@@ -45,34 +46,25 @@
                              <li class="list-group-item">
                                 <div class="row align-items-center">
 
-
-
-                                    @if (_se.valueType == "int" || _se.valueType == "double")
+                                    @if (_se?.modelType?.name == "Property")
                                     {
                                         <div class="col-sm-2">
-                                            <input type="number" @bind-value="InputValue" @bind-value:event="oninput" />
+                                            <input placeholder="Enter a new @_se.idShort value" type="text" @bind-value="InputValue" @bind-value:event="oninput" @onkeypress="HandleKeyPress" />
                                         </div>
                                         
-                                        @*var ValueToUpdate = new BaSyx.Models.Core.AssetAdministrationShell.Implementations.ElementValue((object)InputValue);*@
-                                        @*<button @onclick="@clientAAS.UpdateSubmodelElementValue(SubmodelId,_se?.idShort,ValueToUpdate)">Update</button>*@
                                         <div class="col-sm-10">
-                                            @*<h1>@SeIdShortPath</h1>*@
+                                            
                                             <button @onclick="MakeRequest" >Update</button>
-                                             
+                                            
                                         </div>
                                        
                                     }
-                                    else{
-                                        <div class="col-sm-10">
-                                            <h1>@SeIdShortPath</h1>
-                                        </div>
-                                    }
                                     
-
                                 </div>
                             </li>
 
                         </ul>
+                       
 
                     }
                     else if (_se?.modelType?.name == "SubmodelElementCollection")
@@ -82,8 +74,9 @@
                         foreach (var item in valueItemObj)
                         {
                             
-                          var SeIdShortPath1 = string.Concat(SeIdShortPath, "/", item.idShort);
-                          <SMEcomponent SubmodelId="@SubmodelId" SeIdShortPath="@SeIdShortPath1" _se="item"></SMEcomponent>
+                            var SeIdShortPath1 = string.Concat(SeIdShortPath, "/", item.idShort);
+                            <SMEcomponent SubmodelId="@SubmodelId" SeIdShortPath="@SeIdShortPath1" _se="item" color="#D4E4E8"></SMEcomponent>
+                            
                           
                         }
 
@@ -102,23 +95,22 @@
 
 
 @code {
-    //[Parameter]
-    //public ValueItem? _valueItem { get; set; }
+   
 
-    [Parameter]
+    [Parameter,EditorRequired]
     public CNCMachineAASDashboard.Shared.Models.AAS.SubmodelElement? _se { get; set; }
-    [Parameter]
+    [Parameter,EditorRequired]
     public string? SubmodelId { get; set; }
     [Parameter]
+    public string? color { get; set; }
+    [Parameter,EditorRequired]
     public string? SeIdShortPath { get; set; }
     [Inject]
     public ISignalRService? signalRService  { get; set; }
 
     private string? InputValue { get; set; }
-    private string? RequestPath;
+    
     private object? _response;
-
-    //public AssetAdministrationShellHttpClient? clientAAS;
     public bool isMenuOpen = false;
     public enum DataType
     {
@@ -136,33 +128,21 @@
         var Deserialized = JsonSerializer.Deserialize<List<SubmodelElement>>(str);
         return Deserialized;
     }
-    protected override void OnInitialized()
-    {
-        //clientAAS = aasclient.clientAAS;
-        //string url = configuration.GetValue<string>("HelloAAS_API");
-
-        RequestPath = string.Concat("/aas/submodels/", SubmodelId, "/submodel/submodelElements/",SeIdShortPath,"/value");
-
-        //AssetAdministrationShellHttpClient clientAAS = new AssetAdministrationShellHttpClient(new Uri(url));
-        //this.clientAAS = clientAAS;
-    }
+   
     private async void MakeRequest()
     {
-        _response = signalRService.UpdateServerValue(RequestPath, InputValue);
-
-        //using var httpclient = new HttpClient();
-        //var response= await httpclient.PutAsync(url, UpdateValue);    
-        //if (response.IsSuccessStatusCode)
-        //{
-        //    _response = "Successfull";
-        //}
-        //else
-        //{
-        //    _response = "Not_Successfull";
-        //    // The update failed
-        //    // You can handle the failure scenario here
-        //}
-        //await httpclient.PutAsync("http://192.168.2.186:5180/aas/submodels/MaintenanceSubmodel/submodel/submodelElements/Humidity/value", new StringContent(InputValue,
-        //                           Encoding.UTF8, "application/json"));
+        
+        _response = signalRService.UpdateServerValue(SubmodelId,SeIdShortPath, InputValue);
+        
+        
+    }
+    private async void HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+           
+            _response = signalRService.UpdateServerValue(SubmodelId, SeIdShortPath, InputValue);
+            await InvokeAsync(StateHasChanged); 
+        }
     }
 }

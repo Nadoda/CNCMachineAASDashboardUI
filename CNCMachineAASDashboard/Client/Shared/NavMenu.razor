@@ -1,20 +1,26 @@
 ﻿@using CNCMachineAASDashboard.Client.Services;
 @using CNCMachineAASDashboard.Shared.Models.AAS;
-
+@using Microsoft.JSInterop;
 @inject NavigationManager NavigationManager
 @inject IJSRuntime jSRuntime
 
 <div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
+    <div class="date-time-container container-fluid">
         <a class="navbar-brand" href="">CNCMachineAASDashboard</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+        
+            <div>
+                <p id="dateTimeElement"></p>
+            </div>
+        
     </div>
 </div>
 
+
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
+
+   
+    <nav class="flex-column nav-item px-3" >
+        
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                 <span class="oi oi-home" aria-hidden="true"></span> Home
@@ -47,6 +53,7 @@
                 <span class="oi oi-graph" aria-hidden="true"></span> ADD SE
             </NavLink>
         </div>
+
     </nav>
 </div>
 
@@ -54,10 +61,21 @@
     private bool collapseNavMenu = true;
     private AASModel? _model;
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-     [Inject]
+    [Inject]
     IConfiguration? configuration { get; set; }
     private string? url;
 
+    
+    protected override async void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Call the JavaScript function every second
+            await jSRuntime.InvokeVoidAsync("updateDateTime");
+            var interval = 1000; // 1 second
+            await jSRuntime.InvokeVoidAsync("setInterval", "updateDateTime()", interval);
+        }
+    }
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;

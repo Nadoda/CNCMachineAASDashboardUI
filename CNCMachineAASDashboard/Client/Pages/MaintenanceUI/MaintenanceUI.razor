@@ -1,18 +1,29 @@
-﻿@page "/MaintenanceUI";
+@page "/MaintenanceUI";
+
+@using BaSyx.Models.Core.AssetAdministrationShell.Generics;
 @using CNCMachineAASDashboard.Shared.Models.AAS;
 @using CNCMachineAASDashboard.Client.Services;
+@using Radzen.Blazor;
+@using Radzen;
 
-@inject ISignalRService SignalRService;
+@*<RadzenAlert Visible="true" Title="Warning" Text="Maintenance Warning Alarm" Shade="Radzen.Shade.Default" AllowClose="true" AlertStyle="Radzen.AlertStyle.Success" Style="width: 846px; height: 88px"></RadzenAlert>*@
 
-<PageTitle>Maintenance UI</PageTitle>
-
-
+@*<div class="card border-dark mb-3" Style="width: 208px; height: 113px; display: grid">
+    <div class="card-header" Style="width: 208px; height: 113px; display: grid">
+        <span class="oi oi-timer" Style="width: 45px; height: 50px; font-weight: 400; font-size: 50px" aria-hidden="true"></span>
+        <div class="card border-dark mb-3" Style="width: 108px; height: 50px; display: inline-grid; margin-left: 60px; margin-top: -46px; margin-bottom: 0px; font-size: 30px;text-align:center">
+            @OperatingHour.value
+        </div>
+        <RadzenText Text="Operating Hours" Style="display: inline-block; width: 143px; height: 29px; margin-bottom: 30px; margin-right: 20px; margin-left: 20px; margin-top: 5px; font-size: 18px" />
+    </div>
+</div>*@
+<RadzenImage Path="Images/AAS_Watermark.jpg" Style="position:absolute;top:50%;left:60%;transform:translate(-50%,-50%);opacity:0.6;width:50%;hight:50%;"></RadzenImage>
 
 @if (Submodel != null)
 {
-    <div class="card border-success mb-3">
-        <div class="card-header bg-success">
-            <h4 class="text-white">
+    <div class="card border-success mb-3" >
+        <div class="card-header" style="background-color:#331367;justify-content:center">
+            <h4 class="text-white" style="justify-content:center">
                 @Submodel.idShort
                 @*<a class="text-white">@Submodel.idShort Dashboard</a>*@
             </h4>
@@ -24,36 +35,49 @@
                 <IdentificationComponent _Identification="@Submodel?.identification"></IdentificationComponent>
                 <DescriptionComponent _Description="@Submodel?.description"></DescriptionComponent>
                 <SimanticIdComponent _SemanticId="@Submodel?.semanticId"></SimanticIdComponent>
+                
             </ul>
 
         </div>
     </div>
-
-    @if(Submodel?.submodelElements != null)
+    @if (Submodel?.submodelElements != null)
     {
-        <div class="container-fluid">
+        <div class="row">
+            @foreach (var se in Submodel.submodelElements)
+            {
+                <div class="col-4" style="display:inline-grid; position:relative;justify-content:center;min-width:350px">
+                    <RadzenCard  Style="position:relative; background-color: #d5c2ea" Variant="Radzen.Variant.Filled">
+                        <RadzenText Text="@se.idShort" Style="width: 236px; height: 34px; font-size: 25px; color: #0a0a0a; font-weight: 500" TextAlign="Radzen.TextAlign.Center">
+                            
+                        </RadzenText>
+                        <div style="flex-direction:column;justify-content:center">
+                            @if(se.idShort == "Maintenance_1"){
+                                
+                                <MaintenanceStatusIndicator MWValue="@MW1Value" MTValue="@MT1Value"></MaintenanceStatusIndicator>
+                            }
+                            else if (se.idShort == "Maintenance_2")
+                            {
 
-            <div class="row">
-                @foreach (var se in Submodel.submodelElements)
-                {
-                    <div class="col-md-6">
-                        <div class="grid-item">
-                            <div class="card bg-dark mb-3">
-                                <div class="card-header"><h4 class="text-white">@se.idShort</h4></div>
+                                <MaintenanceStatusIndicator MWValue="@MW2Value" MTValue="@MT2Value"></MaintenanceStatusIndicator>
+                            }
+                            else if (se.idShort == "Maintenance_3")
+                            {
 
-                                <SMEcomponent _se="@se"></SMEcomponent>
-
-                            </div>
-
+                                <MaintenanceStatusIndicator MWValue="@MW3Value" MTValue="@MT3Value"></MaintenanceStatusIndicator>
+                            }
+                            <M_UI_SEComponent _se="se" ></M_UI_SEComponent>
                         </div>
-                    </div>
-                }
-            </div>
-
+                        
+                       
+                    </RadzenCard>
+                </div>
+            }
+            
+            
         </div>
-    }
 
-    
+    }
+   
 }
 else
 {
@@ -62,20 +86,90 @@ else
 }
 
 @code {
-    
+
     public Submodel? Submodel;
+    public SubmodelElement? OperatingHour;
+
+    double MW1Value;
+    double MT1Value;
+    double MW2Value;
+    double MT2Value;
+    double MW3Value;
+    double MT3Value;
+
+    [Inject]
+    private ISignalRService? SignalRService { get; set; }
 
 
     protected override async Task OnInitializedAsync()
     {
-        SignalRService.OnReceivedMaintenance += HandleMessageReceived;
+        SignalRService.OnReceivedMaintenance += HandleMaintenanceReceived;
+        SignalRService.OnOperatingHourSE += HandleOHReceived;
+
+        SignalRService.OnMaintenaceWarningSE += HandleMWReceived;
+        SignalRService.OnMaintenanceThresholdSE += HandleMTReceived;
+        SignalRService.OnMaintenaceWarning2SE += HandleMW2Received;
+        SignalRService.OnMaintenanceThreshold2SE += HandleMT2Received;
+        SignalRService.OnMaintenaceWarning3SE += HandleMW3Received;
+        SignalRService.OnMaintenanceThreshold3SE += HandleMT3Received;
+
         await SignalRService.StartConnection();
-        
+
     }
-    private void HandleMessageReceived(Submodel data)
+    private void HandleMaintenanceReceived(Submodel data)
     {    
         Submodel = data;
-      
+
         StateHasChanged();
     }
+    private void HandleOHReceived(SubmodelElement data)
+    {
+        OperatingHour = data;
+
+        StateHasChanged();
+    }
+    private void HandleMWReceived(SubmodelElement data)
+    {
+       
+        MW1Value = double.Parse(data.value.ToString());
+
+        StateHasChanged();
+    }
+    private void HandleMTReceived(SubmodelElement data)
+    {
+        
+        MT1Value = double.Parse(data.value.ToString());
+
+        StateHasChanged();
+    }
+    private void HandleMW2Received(SubmodelElement data)
+    {
+       
+        MW2Value = double.Parse(data.value.ToString());
+
+        StateHasChanged();
+    }
+    private void HandleMT2Received(SubmodelElement data)
+    {
+      
+        MT2Value = double.Parse(data.value.ToString());
+
+        StateHasChanged();
+    }
+    private void HandleMW3Received(SubmodelElement data)
+    {
+        
+        MW3Value = double.Parse(data.value.ToString());
+
+        StateHasChanged();
+    }
+    private void HandleMT3Received(SubmodelElement data)
+    {
+       
+        MT3Value = double.Parse(data.value.ToString());
+
+        StateHasChanged();
+    }
+   
+   
 }

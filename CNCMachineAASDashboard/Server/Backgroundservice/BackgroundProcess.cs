@@ -1,28 +1,15 @@
 ﻿using CNCMachineAASDashboard.Server.SignalRHub;
-
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Hosting;
-using BaSyx.AAS.Client.Http;
 using BaSyx.Models.Extensions;
 using BaSyx.Models.Core.AssetAdministrationShell.Generics;
 using BaSyx.Utils.ResultHandling;
-using System.Text.Json;
-
-using System;
-
-
 using Newtonsoft.Json;
-using System.Collections.ObjectModel;
-using BaSyx.Models.Core.Common;
-
-
 using CNCMachineAASDashboard.Shared.Models.AAS;
-using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
 using Submodel = CNCMachineAASDashboard.Shared.Models.AAS.Submodel;
-using System.Runtime.Serialization.Formatters.Binary;
-
-//using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
-
+using CNCMachineAASDashboard.Server.AASHttpClient;
+using SubmodelElement = CNCMachineAASDashboard.Shared.Models.AAS.SubmodelElement;
+using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
+using System.Text.Json;
 
 namespace CNCMachineAASDashboard.Server.Backgroundservice
 {
@@ -30,21 +17,21 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
     {
 
 
-
         private readonly ILogger<BackgroundProcess> _logger;
+
         private readonly IHubContext<AAShub> _hubContext;
 
-        private static AssetAdministrationShellHttpClient clientAAS;
+        private readonly AASClient Client;
+       
         private string? ServerEndpoint = Environment.GetEnvironmentVariable("ASPNETCORE_APIURL");
-        public BackgroundProcess(ILogger<BackgroundProcess> logger, IHubContext<AAShub> hubContext)
+        public BackgroundProcess(ILogger<BackgroundProcess> logger, IHubContext<AAShub> hubContext,AASClient client )
         {
-
 
             _logger = logger;
 
             _hubContext = hubContext;
 
-            clientAAS = new AssetAdministrationShellHttpClient(new Uri(ServerEndpoint));
+            Client = client;
 
         }
 
@@ -55,59 +42,37 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
 
                 try
                 {
+                                
+                    var aas = Client.aasclient.RetrieveAssetAdministrationShell();
 
-                    IResult<IAssetAdministrationShell> result = clientAAS.RetrieveAssetAdministrationShell();
-                    //Console.WriteLine(result.Entity.GetType());
+                    var result = aas.Entity;
+
                     if (result == null)
                     {
                         Console.WriteLine("AAS data not received");
-                        Console.WriteLine(result?.GetType());
+
                     }
-                    //var a = result.Entity[]
+
                     else
                     {
-                        var AASGetData = result.Entity.ToJson();
-                        Console.WriteLine(AASGetData);
-
-                        // Console.WriteLine(AASGetData.Asset.IdShort);
-                        // string jsonSerialized = JsonConvert.SerializeObject(AASGetData);
-                        //Console.WriteLine(jsonSerialized);
-
+                        var AASGetData = result.ToJson();
+                       
+                        //Console.WriteLine(AASGetData);
+                       //var AASDeSe = System.Text.Json.JsonSerializer.Deserialize<AssetAdministrationShell>(JsonDocument.Parse(AASGetData));
                         var obj = JsonConvert.DeserializeObject<AASModel>(AASGetData);
-                        //Console.WriteLine(obj);
-
-                        //   var data = result.Entity.ToJson();
-                        // var AASData = System.Text.Json.JsonSerializer.Deserialize<AASModel>(jsonSerialized);
-
-
 
                         await _hubContext.Clients.All.SendAsync("AASdataSend", obj);
 
                         Console.WriteLine($"CNCMAchineAAS dataSent to hub");
-                        //Console.WriteLine(data);
+
                     };
 
+                    //var sms = Client.aasclient.RetrieveSubmodels();
+                    //var Result = sms.Entity.Values;
+                    //await _hubContext.Clients.All.SendAsync("SubmodeldataSend", Result);
 
 
-
-
-                    var MaintenanceSM = clientAAS.RetrieveSubmodel("MaintenanceSubmodel");
-
-                    //IElementContainer<ISubmodelElement> SEs = MaintenanceSM.Entity.SubmodelElements;
-                    //var MData = JsonConvert.SerializeObject(MaintenanceSM.Entity);
-
-                    //var MData = MaintenanceSM.Entity.ToJson();
-                    //var MaintenanceData = System.Text.Json.JsonSerializer.Deserialize<BaSyx.Models.Core.AssetAdministrationShell.Implementations.Submodel>(MData);
-                    //var MaintenanceData = JsonConvert.DeserializeObject<BaSyx.Models.Core.AssetAdministrationShell.Implementations.Submodel>(MData);
-
-
-                    // var se = clientAAS.RetrieveSubmodelElement("MaintenanceSubmodel","Maintenance_1");
-                    // var SEd= se.Entity.ToJson();
-                    // //var SEd = JsonConvert.SerializeObject(se.Entity);
-                    // var ata = JsonConvert.DeserializeObject<SubmodelElementCollection>(SEd);
-                    // //var ata = System.Text.Json.JsonSerializer.Deserialize<SubmodelElementCollection>(SEd);
-
-
+                    var MaintenanceSM = Client.aasclient.RetrieveSubmodel("MaintenanceSubmodel");
 
                     if (MaintenanceSM == null)
                     {
@@ -119,20 +84,11 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
                         var Data = MaintenanceSM.Entity.ToJson();
                         Console.WriteLine(Data);
                         var MaintenanceData = System.Text.Json.JsonSerializer.Deserialize<Submodel>(Data);
+                        
                         await _hubContext.Clients.All.SendAsync("MaintenancedataSend", MaintenanceData);
-                        Console.WriteLine($"{MaintenanceSM.Entity.IdShort} dataSent to hub");
-                        //Console.WriteLine(Data);
 
-                        ////// Code to manage MaintenanceHistory Data of Maintenance_3 SE (Useful Logic) //////////
-
-                        //var se3 = MaintenanceData.submodelElements?.Find(n => n.idShort == "Maintenance_3");
-                        //var MHsev = se3.value.Find(n => n.idShort == "MaintenanceHistory");
-                        //var mr1 = MHsev.value.Find(n => n.idShort == "MaintenanceRecord_1");
-                        //Console.WriteLine(mr1.value is JsonElement);
-                        //Console.WriteLine(mr1.value.ToString());
-                        //var obj = System.Text.Json.JsonSerializer.Deserialize<List<ValueItem2>>(mr1.value.ToString());
                     };
-                    var OperationalSM = clientAAS.RetrieveSubmodel("OperationalDataSubmodel");
+                    var OperationalSM = Client.aasclient.RetrieveSubmodel("OperationalDataSubmodel");
 
                     if (OperationalSM == null)
                     {
@@ -145,10 +101,81 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
                         var OperationalData = System.Text.Json.JsonSerializer.Deserialize<Submodel>(Data);
                         await _hubContext.Clients.All.SendAsync("OperationaldataSend", OperationalData);
                         Console.WriteLine($"{OperationalSM.Entity.IdShort} dataSent to hub");
-                        //Console.WriteLine(Data);
+
 
                     };
+
+                    var OperatingHourSE = Client.aasclient.RetrieveSubmodelElement("MaintenanceSubmodel", "Maintenance_1/MaintenanceDetails/OperatingHours");
+                    if (OperatingHourSE == null)
+                    {
+                        Console.WriteLine("Operating Hours data not received");
+                    }
+
+                    else
+                    {
+                        var Data = OperatingHourSE.Entity.ToJson();
+                        var OperatingHourData = System.Text.Json.JsonSerializer.Deserialize<SubmodelElement>(Data);
+                        await _hubContext.Clients.All.SendAsync("OperatingHourSESend", OperatingHourData);
+                    };
+
+                    var MaintenanceWarningSE = Client.aasclient.RetrieveSubmodelElement("MaintenanceSubmodel", "Maintenance_1/MaintenanceDetails/MaintenanceWarning");
+                    if (MaintenanceWarningSE == null)
+                    {
+                        Console.WriteLine("Maintenance Warning data not received");
+                    }
+
+                    else
+                    {
+                        var Data = MaintenanceWarningSE.Entity.ToJson();
+                        var MaintenanceWarningData = System.Text.Json.JsonSerializer.Deserialize<SubmodelElement>(Data);
+                        await _hubContext.Clients.All.SendAsync("MaintenanceWarningSESend", MaintenanceWarningData);
+                    };
+
+                    var MaintenanceThresholdSE = Client.aasclient.RetrieveSubmodelElement("MaintenanceSubmodel", "Maintenance_1/MaintenanceDetails/MaintenanceThreshold");
+                    if (MaintenanceWarningSE == null)
+                    {
+                        Console.WriteLine("Maintenance Threshold data not received");
+                    }
+
+                    else
+                    {
+                        var Data = MaintenanceThresholdSE.Entity.ToJson();
+                        var MaintenanceThresholdData = System.Text.Json.JsonSerializer.Deserialize<SubmodelElement>(Data);
+                        await _hubContext.Clients.All.SendAsync("MaintenanceThresholdSESend", MaintenanceThresholdData);
+                    };
+                    var ActualOrderStatusSE = Client.aasclient.RetrieveSubmodelElement("MaintenanceSubmodel", "Maintenance_1/MaintenanceOrderStatus/ActualOrderStatus");
+                    if (MaintenanceWarningSE == null)
+                    {
+                        Console.WriteLine("Order Status data not received");
+                    }
+
+                    else
+                    {
+                        var Data = ActualOrderStatusSE.Entity.ToJson();
+                        var ActualOrderStatusdData = System.Text.Json.JsonSerializer.Deserialize<SubmodelElement>(Data);
+                        await _hubContext.Clients.All.SendAsync("ActualOrderStatusSESend", ActualOrderStatusdData);
+                    };
+
+                    var MaintenanceWarning2SE = Client.aasclient.RetrieveSubmodelElement("MaintenanceSubmodel", "Maintenance_2/MaintenanceDetails/MaintenanceWarning");
+                    var MaintenanceWarning2Data = System.Text.Json.JsonSerializer.Deserialize<SubmodelElement>(MaintenanceWarning2SE.Entity.ToJson());
+                    await _hubContext.Clients.All.SendAsync("MaintenanceWarning2SESend", MaintenanceWarning2Data);
+
+
+                    var MaintenanceThreshold2SE = Client.aasclient.RetrieveSubmodelElement("MaintenanceSubmodel", "Maintenance_2/MaintenanceDetails/MaintenanceThreshold");                                    
+                    var MaintenanceThreshold2Data = System.Text.Json.JsonSerializer.Deserialize<SubmodelElement>(MaintenanceThreshold2SE.Entity.ToJson());
+                    await _hubContext.Clients.All.SendAsync("MaintenanceThreshold2SESend", MaintenanceThreshold2Data);
+
+                    var MaintenanceWarning3SE = Client.aasclient.RetrieveSubmodelElement("MaintenanceSubmodel", "Maintenance_3/MaintenanceDetails/MaintenanceWarning");
+                    var MaintenanceWarning3Data = System.Text.Json.JsonSerializer.Deserialize<SubmodelElement>(MaintenanceWarning3SE.Entity.ToJson());
+                    await _hubContext.Clients.All.SendAsync("MaintenanceWarning3SESend", MaintenanceWarning3Data);
+
+
+                    var MaintenanceThreshold3SE = Client.aasclient.RetrieveSubmodelElement("MaintenanceSubmodel", "Maintenance_3/MaintenanceDetails/MaintenanceThreshold");
+                    var MaintenanceThreshold3Data = System.Text.Json.JsonSerializer.Deserialize<SubmodelElement>(MaintenanceThreshold3SE.Entity.ToJson());
+                    await _hubContext.Clients.All.SendAsync("MaintenanceThreshold3SESend", MaintenanceThreshold3Data);
+
                     await Task.Delay(1000);
+                    
 
                 }
                 catch (Exception ex)

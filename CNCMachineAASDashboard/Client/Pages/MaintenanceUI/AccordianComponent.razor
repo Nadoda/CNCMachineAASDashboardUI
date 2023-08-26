@@ -1,0 +1,33 @@
+﻿@using CNCMachineAASDashboard.Shared.Models.AAS;
+<RadzenAccordion Style="margin-top: 15px; width:245px">
+    <Items>
+        <RadzenAccordionItem   Text="@Title" Icon="description">
+            <ul class="list-group" style="block-size:auto">
+                @foreach (var item in SeList)
+                {
+                    <li class="list-group-item" style="background-color:#d6cbe5">
+                        <div class="row align-items-center" style="font-size:small;justify-content:center">
+                            <b>@item.idShort</b>
+                            
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row align-items-center" style="font-size:small;justify-content:center">
+                            @item.value
+                        </div>
+                    </li>
+                }
+                
+                
+            </ul>
+        </RadzenAccordionItem>
+    </Items>
+</RadzenAccordion>
+
+@code{
+    [Parameter]
+    public List<SubmodelElement>? SeList { get; set; }
+    [Parameter]
+    public string? Title { get; set; }
+
+}

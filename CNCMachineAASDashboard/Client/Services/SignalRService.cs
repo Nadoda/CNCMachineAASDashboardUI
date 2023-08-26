@@ -1,14 +1,18 @@
 ﻿using CNCMachineAASDashboard.Shared.Models.AAS;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
+using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
+using Submodel = CNCMachineAASDashboard.Shared.Models.AAS.Submodel;
 
+using BaSyx.Models.Core.AssetAdministrationShell.Generics;
+using SubmodelElement = CNCMachineAASDashboard.Shared.Models.AAS.SubmodelElement;
 
 namespace CNCMachineAASDashboard.Client.Services
 {
 
     public class SignalRService : ISignalRService
     {
-        private static HubConnection hubConnection;
+        private static HubConnection? hubConnection;
         private readonly NavigationManager NavigationManager;
         public bool IsConnected { get { return hubConnection?.State == HubConnectionState.Connected; } }
 
@@ -16,6 +20,15 @@ namespace CNCMachineAASDashboard.Client.Services
         public event Action<Submodel>? OnReceivedMaintenance;
         public event Action<Submodel>? OnReceivedOperational;
         public event Action<string>? OnReceivedMessage;
+        public event Action<SubmodelElement>? OnOperatingHourSE;
+        public event Action<SubmodelElement>? OnMaintenaceWarningSE;
+        public event Action<SubmodelElement>? OnMaintenanceThresholdSE;
+        public event Action<SubmodelElement>? OnMaintenaceWarning2SE;
+        public event Action<SubmodelElement>? OnMaintenanceThreshold2SE;
+        public event Action<SubmodelElement>? OnMaintenaceWarning3SE;
+        public event Action<SubmodelElement>? OnMaintenanceThreshold3SE;
+        public event Action<SubmodelElement>? OnOrderStatusSE;
+        public event Action<SubmodelElement>? OnRetrievedSE;
 
         public SignalRService(NavigationManager navigationManager)
         {
@@ -38,11 +51,45 @@ namespace CNCMachineAASDashboard.Client.Services
             {
                 OnReceivedOperational?.Invoke(data);
             });
-
-            hubConnection.On<string>("Message", data =>
+            hubConnection.On<SubmodelElement>("OperatingHourSESend", data =>
+            {
+                OnOperatingHourSE?.Invoke(data);
+            });
+            hubConnection.On<SubmodelElement>("MaintenanceWarningSESend", data =>
+            {
+                OnMaintenaceWarningSE?.Invoke(data);
+            });
+            hubConnection.On<SubmodelElement>("MaintenanceThresholdSESend", data =>
+            {
+                
+                OnMaintenanceThresholdSE?.Invoke(data);
+            });
+            hubConnection.On<SubmodelElement>("MaintenanceWarning2SESend", data =>
+            {
+                OnMaintenaceWarning2SE?.Invoke(data);
+            });
+            hubConnection.On<SubmodelElement>("MaintenanceThreshold2SESend", data =>
             {
 
-                OnReceivedMessage?.Invoke(data);
+                OnMaintenanceThreshold2SE?.Invoke(data);
+            });
+            hubConnection.On<SubmodelElement>("MaintenanceWarning3SESend", data =>
+            {
+                OnMaintenaceWarning3SE?.Invoke(data);
+            });
+            hubConnection.On<SubmodelElement>("MaintenanceThreshold3SESend", data =>
+            {
+
+                OnMaintenanceThreshold3SE?.Invoke(data);
+            });
+            hubConnection.On<SubmodelElement>("ActualOrderStatusSESend", data =>
+            {
+                OnOrderStatusSE?.Invoke(data);
+            });
+
+            hubConnection.On<SubmodelElement>("RetrieveSESend", data =>
+            {
+                OnRetrievedSE?.Invoke(data);
 
             });
 
@@ -52,10 +99,15 @@ namespace CNCMachineAASDashboard.Client.Services
 
             await hubConnection.StartAsync();
         }
-
-        public async Task UpdateServerValue(string address,string value)
+        public async Task UpdateServerValue(string SubmodelId, string SeIdShortPath,string value)
         {
-            await hubConnection.InvokeAsync("UpdateToServer", address,value);
+            await hubConnection.InvokeAsync("UpdateToServer", SubmodelId,SeIdShortPath, value);
+        }
+        public async Task RetrieveSE(string SubmodelId, string SeIdShortPath)
+        {
+            await hubConnection.InvokeAsync("RetrieveSE", SubmodelId, SeIdShortPath);
+            
+           
         }
     }
 

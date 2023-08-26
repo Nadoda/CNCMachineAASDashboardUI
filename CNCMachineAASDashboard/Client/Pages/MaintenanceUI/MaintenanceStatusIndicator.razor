@@ -1,0 +1,44 @@
+﻿
+@using CNCMachineAASDashboard.Client.Services;
+@using CNCMachineAASDashboard.Shared.Models.AAS;
+
+
+
+<RadzenRadialGauge Style="width: 250px; height: 250px;">
+    <RadzenRadialGaugeScale StartAngle="-150" EndAngle="150" Step="100" Min="0" Max="MTValue+100" TickPosition=@tickPosition>
+        <RadzenRadialGaugeScalePointer Value=@OHValue Length="0.6" ShowValue=@showValue>
+            <Template Context="pointer">
+                <span style="justify-content:center;font-size:xx-small"> Maintenance</span>
+                <span style="justify-content:center;font-size:xx-small"> Status</span>
+            </Template>
+        </RadzenRadialGaugeScalePointer>
+        <RadzenRadialGaugeScaleRange From="0" To="MWValue" Fill="green" />
+        <RadzenRadialGaugeScaleRange From="MWValue" To="MTValue" Fill="orange" />
+        <RadzenRadialGaugeScaleRange From="MTValue" To="MTValue+100" Fill="red" />
+    </RadzenRadialGaugeScale>
+</RadzenRadialGauge>
+@code {
+    [Inject]
+    private ISignalRService? SignalRService { get; set; }
+    [Parameter]
+    public double MWValue { get; set; }
+    [Parameter]
+    public double MTValue { get; set; }
+
+    public double OHValue;
+    bool showValue = true;
+    GaugeTickPosition tickPosition = GaugeTickPosition.None;
+
+    protected override async Task OnInitializedAsync()
+    {
+        SignalRService.OnOperatingHourSE += HandleOHReceived;
+        await SignalRService.StartConnection();
+    }
+    private void HandleOHReceived(SubmodelElement data)
+    {
+        OHValue = double.Parse(data.value.ToString());
+        StateHasChanged();
+    }
+ 
+  
+}

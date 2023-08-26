@@ -1,0 +1,81 @@
+﻿@using BaSyx.AAS.Client.Http;
+@using System.Text.Json;
+@using BaSyx.Models.Core.Common;
+@using BaSyx.Models;
+@using CNCMachineAASDashboard.Client.Services;
+@using CNCMachineAASDashboard.Shared.Models.AAS;
+@using System.Text;
+@using System.Drawing;
+
+@if (_se.idShort == "OperatingHours")
+{
+
+    <RadzenCard Style="width: 245px; height: 101px; display:grid; margin-top: 15px">
+        <RadzenIcon Icon="schedule" Style="font-size: 60px; width: 56px; height: 58px;color:#cd66e2"></RadzenIcon>
+        <RadzenCard Style="width: 113px; height: 52px; display: inline-block; margin-left: 70px; margin-top: -60px;font-size:larger;justify-content:safe center">
+            <b>@_se.value</b>
+        </RadzenCard>
+            <RadzenText Text="Operating Hour" TextAlign="Radzen.TextAlign.Center" Style="height: 29px; font-size: 20px" />
+    </RadzenCard>
+
+}
+else if (_se.idShort== "ActualOrderStatus")
+{
+    <OrderComponent _se="_se"></OrderComponent>
+}
+else if (_se.idShort == "MaintenanceCounter")
+{
+ <RadzenCard Style="width: 245px; height: 101px; display: grid; margin-top: 15px">
+        <RadzenIcon Icon="timelapse" Style="font-size: 60px; width: 56px; height: 58px;color:#a17fe3"></RadzenIcon>
+        <RadzenCard Style="width: 113px; height: 52px; display: inline-block; margin-left: 70px; margin-top: -60px;font-size:larger;justify-content:safe center">
+            <b>@_se.value</b>
+       </RadzenCard>
+    <RadzenText Text="Maintenance Counter" TextAlign="Radzen.TextAlign.Center" Style="height: 29px; font-size: 20px" />
+  </RadzenCard>
+}
+
+
+
+else if (_se?.modelType?.name == "SubmodelElementCollection")
+{
+   
+    var valueItemObj = Deserialize(_se.value.ToString());
+
+    @if (_se.idShort == "MaintenanceOrderDescription" )
+    {
+        <AccordianComponent Title="Maintenance Order Details" SeList="valueItemObj"></AccordianComponent>
+        @*<SECDialogBox Title="Maintenance Order Details" SeList="valueItemObj"></SECDialogBox>*@
+    }
+    else if ( _se.idShort == "MaintenanceRecord")
+    {
+        <AccordianComponent Title="Maintenance Record" SeList="valueItemObj"></AccordianComponent>
+        @*<SECDialogBox Title="Maintenance Record" SeList="valueItemObj"></SECDialogBox>*@
+    }
+    foreach (var item in valueItemObj)
+    {                    
+         <M_UI_SEComponent _se="item" ></M_UI_SEComponent>
+    }
+
+}
+
+                
+
+
+
+
+@code {
+
+
+    [Parameter]
+    public CNCMachineAASDashboard.Shared.Models.AAS.SubmodelElement? _se { get; set; }
+  
+
+    public List<SubmodelElement> Deserialize(string str)
+    {
+        var Deserialized = JsonSerializer.Deserialize<List<SubmodelElement>>(str);
+        return Deserialized;
+    }
+
+
+
+}

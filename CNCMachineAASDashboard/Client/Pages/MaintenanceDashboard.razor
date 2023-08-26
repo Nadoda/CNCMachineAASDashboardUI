@@ -5,16 +5,15 @@
 @using CNCMachineAASDashboard.Shared.Models.AAS;
 @using CNCMachineAASDashboard.Client.Services;
 
-@inject NavigationManager NavigationManager;
-@inject ISignalRService SignalRService;
+
 <PageTitle>Maintenance Dashboard</PageTitle>
 
-<h1>An Issue while incrementing the OH with Timer instead Delay</h1>
+
 
 @if (Submodel != null)
 {
     <div class="card border-success mb-3">
-        <div class="card-header bg-success">
+        <div class="card-header bg-secondary">
             <h4 class="text-white">
                 @Submodel.idShort
             </h4>
@@ -37,7 +36,7 @@
         <div class="container-fluid">
             @foreach (var se in Submodel.submodelElements)
             {
-                <SMEcomponent SubmodelId="@Submodel.idShort" SeIdShortPath="@se.idShort" _se="@se"></SMEcomponent>
+                <SMEcomponent SubmodelId="@Submodel.idShort" SeIdShortPath="@se.idShort" _se="@se" color="#AAE4F3"></SMEcomponent>
                 
             }
             
@@ -56,18 +55,14 @@ else
 
 @code {
 
-    //[Inject]
-    //private ISignalRService SignalRService { get; set; }
-    //private HubConnection? hubConnection;
+ 
 
-    //public bool IsConnected;
     
     public Submodel? Submodel;
 
     public object? SignalRData;
-
-    
-
+    [Inject]
+    private ISignalRService SignalRService { get; set; }
   
 
     protected override async Task OnInitializedAsync()
@@ -75,29 +70,6 @@ else
         SignalRService.OnReceivedMaintenance += HandleMessageReceived;
         await SignalRService.StartConnection();
 
-        
-        
-        //hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/dataSend")).Build();
-
-
-        //hubConnection.On<Submodel>("MaintenancedataSend", data =>
-        //{
-
-        //    SignalRData = data;
-
-        //    if (data != null)
-        //    {
-
-        //        Submodel = data;
-
-        //    }
-
-        //    StateHasChanged();
-        //});
-        //await hubConnection.StartAsync();
-
-        //IsConnected = hubConnection.State == HubConnectionState.Connected ? true : false;
-        //StateHasChanged();
 
     }
     private void HandleMessageReceived(Submodel data)

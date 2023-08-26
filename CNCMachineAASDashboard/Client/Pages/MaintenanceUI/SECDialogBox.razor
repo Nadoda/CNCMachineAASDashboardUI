@@ -1,0 +1,39 @@
+﻿@using CNCMachineAASDashboard.Shared.Models.AAS;
+@inject DialogService DialogService
+
+<div Style="width: 245px; height: 101px; display:grid; margin-top: 15px">
+    <RadzenButton Style="text-transform:capitalize" Text="@Title" ButtonStyle="ButtonStyle.Light" Click=@ShowInlineDialog />
+</div>
+
+@code {
+  
+    [Parameter]
+    public List<SubmodelElement>? SeList { get; set; }
+    [Parameter]
+    public string? Title { get; set; }
+
+    async Task ShowInlineDialog()
+    {
+        var result = await DialogService.OpenAsync(Title, ds =>
+    @<RadzenStack Gap="1.5rem" Style="transition:ease-in-out">
+        <ul class="list-group" style="block-size:auto">
+            @foreach (var item in SeList)
+            {
+                <li class="list-group-item">
+                    <div class="row align-items-center">
+                        <div class="col-sm-2"><b>@item.idShort</b></div>
+                        <div class="flex-sm-column">@item.value</div>
+                    </div>
+                </li>
+                
+            }
+
+
+        </ul>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+           
+            <RadzenButton Text="Ok" Click="() => ds.Close(true)" Style="width: 80px;" />
+        </RadzenStack>
+    </RadzenStack>, new DialogOptions() { CloseDialogOnOverlayClick = true });
+    }
+}

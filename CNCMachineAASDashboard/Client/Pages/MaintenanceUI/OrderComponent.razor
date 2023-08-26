@@ -1,0 +1,66 @@
+﻿@using CNCMachineAASDashboard.Shared.Models.AAS;
+
+<RadzenCard Style="width: 245px; height: 101px; display: grid; margin-top: 15px">
+    <div style="color:@ColorCode;color:">
+        <RadzenIcon Icon="@IconSymbol" Style="font-size: 60px; width: 50px; height: 50px"></RadzenIcon>
+    </div>
+    
+    <RadzenCard Style="width: 149px; height: 52px; display: inline-block; margin-left: 70px; margin-top: -60px">
+        @_se.value
+    </RadzenCard>
+    <RadzenText Text="Order Status" TextAlign="Radzen.TextAlign.Center" Style="height: 29px; font-size: 20px" />
+</RadzenCard>
+
+@code {
+    [Parameter]
+    public SubmodelElement? _se { get; set; }
+
+    string? IconSymbol;
+    string? ColorCode ="red" ;
+    public enum Icons
+    {
+        pending_actions,
+        assignment_turned_in,
+        history_toggle_off,
+        cancel,
+        shopping_bag
+    }
+    public enum Colors
+    {
+        darkgreen,
+        darkred,
+        gray
+    }
+
+    
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_se.value.ToString() == "OrderCompleted")
+        {
+            IconSymbol = Icons.assignment_turned_in.ToString();
+            ColorCode = Colors.darkgreen.ToString();
+        }
+        else if (_se.value.ToString() == "OrderInProgress")
+        {
+            IconSymbol = Icons.history_toggle_off.ToString();
+            ColorCode = Colors.gray.ToString();
+        }
+        else if (_se.value.ToString() == "OrderPending")
+        {
+            IconSymbol = Icons.pending_actions.ToString();
+            ColorCode = Colors.gray.ToString();
+        }
+        else if (_se.value.ToString() == "OrderRejected")
+        {
+            IconSymbol = Icons.cancel.ToString();
+            ColorCode = Colors.darkred.ToString();
+        }
+        else
+        {
+            IconSymbol = Icons.shopping_bag.ToString();
+            ColorCode = Colors.gray.ToString();
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+}

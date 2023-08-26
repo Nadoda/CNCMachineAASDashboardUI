@@ -1,0 +1,156 @@
+@page "/OperationalData";
+
+@using BaSyx.AAS.Client.Http;
+@using Microsoft.AspNetCore.SignalR.Client;
+@using CNCMachineAASDashboard.Shared.Models.AAS;
+@using CNCMachineAASDashboard.Client.Services;
+@using System.Text.Json;
+@using Newtonsoft.Json;
+
+
+
+
+@if (Submodel != null)
+{
+    <div class="card border-success mb-3">
+        <div class="card-header bg-secondary">
+            <h4 class="text-white">
+                @Submodel.idShort
+            </h4>
+        </div>
+        <div>
+
+            <ul class="list-group list-group-flush">
+                <IdshortComponent _Idshort="@Submodel?.idShort"></IdshortComponent>
+                <IdentificationComponent _Identification="@Submodel?.identification"></IdentificationComponent>
+                <DescriptionComponent _Description="@Submodel?.description"></DescriptionComponent>
+                <SimanticIdComponent _SemanticId="@Submodel?.semanticId"></SimanticIdComponent>
+            </ul>
+
+        </div>
+    </div>
+
+    <RadzenChart>
+        @foreach (var kvp in seDictionary)
+        {
+            string measurement = kvp.Key;
+            var measurementList = kvp.Value;
+
+            Console.WriteLine($"{measurement} list: {string.Join(", ", measurementList)}");
+            @if (kvp.Key != "MachineStatus")
+
+            {
+                <RadzenLineSeries Visible="true" Smooth="true" Data="@kvp.Value" CategoryProperty="x" Title="@kvp.Key" LineType="LineType.Solid"
+                      ValueProperty="value">
+                    <RadzenMarkers MarkerType="MarkerType.Circle"></RadzenMarkers>
+                </RadzenLineSeries>
+                <RadzenValueAxis>
+                    <RadzenGridLines Visible="true"></RadzenGridLines>
+                </RadzenValueAxis>
+            }
+
+
+        }
+    </RadzenChart>
+
+    @if (Submodel?.submodelElements != null)
+    {
+        <div class="container-fluid">
+            @foreach (var se in Submodel.submodelElements)
+            {
+                <SMEcomponent SubmodelId="@Submodel.idShort" SeIdShortPath="@se.idShort" _se="@se" color="#AAE4F3"></SMEcomponent>
+
+            }
+
+        </div>
+    }
+
+}
+else
+{
+    <h1>Sorry! There is nothing at this Page</h1>
+    <h1>Check your SignalR status</h1>
+}
+
+
+
+
+@code {
+
+
+
+    public Submodel? Submodel;
+
+    public Dictionary<string, List<ChartDataPoint>>? seDictionary;
+    public object? SignalRData;
+    [Inject]
+    private ISignalRService SignalRService { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        seDictionary = new Dictionary<string, List<ChartDataPoint>>();
+        seDictionary["Temperature"] = new List<ChartDataPoint>();
+        seDictionary["Humidity"] = new List<ChartDataPoint>();
+        seDictionary["Speed"] = new List<ChartDataPoint>();
+        seDictionary["MachineStatus"] = new List<ChartDataPoint>();
+        SignalRService.OnReceivedOperational += HandleMessageReceived;
+        SignalRService.OnReceivedOperational += HandleSELogic;
+        await SignalRService.StartConnection();
+
+    }
+
+    private void HandleMessageReceived(Submodel data)
+    {
+
+
+        Submodel = data;
+
+        StateHasChanged();
+    }
+    private async void HandleSELogic(Submodel data)
+    {
+
+        var OperationalSEList = data.submodelElements;
+        await Task.Run(() =>
+          {
+              foreach (var _se in OperationalSEList)
+              {
+                  if (_se?.modelType?.name == "SubmodelElementCollection")
+                  {
+
+                      var valueItemObj = Deserialize(_se.value.ToString());
+                      foreach (var se in valueItemObj)
+                      {
+                          //seDictionary[se.idShort] = new List<SubmodelElement>();
+                          if (seDictionary.ContainsKey(se.idShort))
+                          {
+                              var serdata= System.Text.Json.JsonSerializer.Serialize(se);
+                              var Data = System.Text.Json.JsonSerializer.Deserialize<ChartDataPoint>(serdata);
+                              seDictionary[se.idShort].Add(Data);
+
+                          }
+                      }
+
+
+                  }
+              }
+              InvokeAsync(StateHasChanged);
+          });
+
+
+
+    }
+    public List<SubmodelElement> Deserialize(string str)
+    {
+        var Deserialized = System.Text.Json.JsonSerializer.Deserialize<List<SubmodelElement>>(str);
+        return Deserialized;
+    }
+
+    public class ChartDataPoint
+    {
+        public DateTime x { get; set; } = DateTime.Now;
+        public double value { get; set; }
+    }
+
+}

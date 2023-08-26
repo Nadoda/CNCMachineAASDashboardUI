@@ -12,6 +12,6 @@ namespace CNCMachineAASDashboard.Shared.Models.AAS
         public ModelType? modelType { get; set; }
         public object? value { get; set; }
         public string? valueType { get; set; }
-        //public List<ValueItem>? value { get; set; }
+        
     }
 }
