@@ -3,8 +3,7 @@
 @using BaSyx.Models.Core.AssetAdministrationShell.Generics;
 @using CNCMachineAASDashboard.Shared.Models.AAS;
 @using CNCMachineAASDashboard.Client.Services;
-@using Radzen.Blazor;
-@using Radzen;
+
 
 @*<RadzenAlert Visible="true" Title="Warning" Text="Maintenance Warning Alarm" Shade="Radzen.Shade.Default" AllowClose="true" AlertStyle="Radzen.AlertStyle.Success" Style="width: 846px; height: 88px"></RadzenAlert>*@
 
@@ -17,8 +16,8 @@
         <RadzenText Text="Operating Hours" Style="display: inline-block; width: 143px; height: 29px; margin-bottom: 30px; margin-right: 20px; margin-left: 20px; margin-top: 5px; font-size: 18px" />
     </div>
 </div>*@
-<RadzenImage Path="Images/AAS_Watermark.jpg" Style="position:absolute;top:50%;left:60%;transform:translate(-50%,-50%);opacity:0.6;width:50%;hight:50%;"></RadzenImage>
-
+@*<RadzenImage Path="Images/AAS_Watermark.jpg" Style="position:absolute;top:50%;left:60%;transform:translate(-50%,-50%);opacity:0.6;width:50%;hight:50%;"></RadzenImage>
+*@
 @if (Submodel != null)
 {
     <div class="card border-success mb-3" >
@@ -171,5 +170,6 @@ else
         StateHasChanged();
     }
    
+    
    
 }
