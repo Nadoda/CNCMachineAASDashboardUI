@@ -1,30 +1,15 @@
 @page "/MaintenanceUI";
 
-@using BaSyx.Models.Core.AssetAdministrationShell.Generics;
 @using CNCMachineAASDashboard.Shared.Models.AAS;
 @using CNCMachineAASDashboard.Client.Services;
 
 
-@*<RadzenAlert Visible="true" Title="Warning" Text="Maintenance Warning Alarm" Shade="Radzen.Shade.Default" AllowClose="true" AlertStyle="Radzen.AlertStyle.Success" Style="width: 846px; height: 88px"></RadzenAlert>*@
-
-@*<div class="card border-dark mb-3" Style="width: 208px; height: 113px; display: grid">
-    <div class="card-header" Style="width: 208px; height: 113px; display: grid">
-        <span class="oi oi-timer" Style="width: 45px; height: 50px; font-weight: 400; font-size: 50px" aria-hidden="true"></span>
-        <div class="card border-dark mb-3" Style="width: 108px; height: 50px; display: inline-grid; margin-left: 60px; margin-top: -46px; margin-bottom: 0px; font-size: 30px;text-align:center">
-            @OperatingHour.value
-        </div>
-        <RadzenText Text="Operating Hours" Style="display: inline-block; width: 143px; height: 29px; margin-bottom: 30px; margin-right: 20px; margin-left: 20px; margin-top: 5px; font-size: 18px" />
-    </div>
-</div>*@
-@*<RadzenImage Path="Images/AAS_Watermark.jpg" Style="position:absolute;top:50%;left:60%;transform:translate(-50%,-50%);opacity:0.6;width:50%;hight:50%;"></RadzenImage>
-*@
 @if (Submodel != null)
 {
     <div class="card border-success mb-3" >
         <div class="card-header" style="background-color:#331367;justify-content:center">
             <h4 class="text-white" style="justify-content:center">
                 @Submodel.idShort
-                @*<a class="text-white">@Submodel.idShort Dashboard</a>*@
             </h4>
         </div>
         <div>
@@ -45,7 +30,7 @@
             @foreach (var se in Submodel.submodelElements)
             {
                 <div class="col-4" style="display:inline-grid; position:relative;justify-content:center;min-width:350px">
-                    <RadzenCard  Style="position:relative; background-color: #d5c2ea" Variant="Radzen.Variant.Filled">
+                    <RadzenCard  Style="position:relative; background-color: #d5c2ea;padding-top:0px" Variant="Radzen.Variant.Filled">
                         <RadzenText Text="@se.idShort" Style="width: 236px; height: 34px; font-size: 25px; color: #0a0a0a; font-weight: 500" TextAlign="Radzen.TextAlign.Center">
                             
                         </RadzenText>
@@ -64,7 +49,7 @@
 
                                 <MaintenanceStatusIndicator MWValue="@MW3Value" MTValue="@MT3Value"></MaintenanceStatusIndicator>
                             }
-                            <M_UI_SEComponent _se="se" ></M_UI_SEComponent>
+                            <M_UI_SEComponent _se="se" SeIdShortPath="@se.idShort" ></M_UI_SEComponent>
                         </div>
                         
                        

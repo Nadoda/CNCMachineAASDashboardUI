@@ -1,14 +1,15 @@
 ﻿@using CNCMachineAASDashboard.Shared.Models.AAS;
 
-<RadzenCard Style="width: 245px; height: 101px; display: grid; margin-top: 15px">
-    <div style="color:@ColorCode;color:">
-        <RadzenIcon Icon="@IconSymbol" Style="font-size: 60px; width: 50px; height: 50px"></RadzenIcon>
+<RadzenCard Style="width: 245px; height: 78px; display: grid; margin-top: 10px">
+    <div style="color:@ColorCode ;display: grid;">
+        <RadzenIcon Icon="@IconSymbol" Style="font-size: 60px; width: 47px; height: 43px"></RadzenIcon>
+        <RadzenCard Style="width: 119px; height: 46px; display: inline-block; margin-left: 70px;padding:0px; margin-top: -50px;overflow:auto">
+            @_se.value
+        </RadzenCard>
     </div>
     
-    <RadzenCard Style="width: 149px; height: 52px; display: inline-block; margin-left: 70px; margin-top: -60px">
-        @_se.value
-    </RadzenCard>
-    <RadzenText Text="Order Status" TextAlign="Radzen.TextAlign.Center" Style="height: 29px; font-size: 20px" />
+    
+    <RadzenText Text="Order Status" TextAlign="Radzen.TextAlign.Center" Style="height: 28px; font-size: 15px" />
 </RadzenCard>
 
 @code {

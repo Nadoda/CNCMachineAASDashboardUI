@@ -1,5 +1,4 @@
-﻿using BaSyx.Models.Core.AssetAdministrationShell.Generics;
-using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
+﻿
 using CNCMachineAASDashboard.Shared.Models.AAS;
 using Submodel = CNCMachineAASDashboard.Shared.Models.AAS.Submodel;
 using SubmodelElement = CNCMachineAASDashboard.Shared.Models.AAS.SubmodelElement;

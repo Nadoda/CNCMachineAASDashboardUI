@@ -1,4 +1,5 @@
 ﻿using BaSyx.AAS.Client.Http;
+using Microsoft.Extensions.Configuration;
 
 
 namespace CNCMachineAASDashboard.Server.AASHttpClient
@@ -8,12 +9,14 @@ namespace CNCMachineAASDashboard.Server.AASHttpClient
     public class AASClient 
     {
        public readonly AssetAdministrationShellHttpClient aasclient;
-       public string? ServerEndpoint { get; set; } = Environment.GetEnvironmentVariable("ASPNETCORE_APIURL");
+       public string? ServerEndpoint { get; set; } 
 
-        public AASClient()
+       private readonly IConfiguration _Configuration;
+        public AASClient(IConfiguration Configuration)
         {
-           
-            aasclient = new AssetAdministrationShellHttpClient(new Uri(ServerEndpoint));
+           _Configuration = Configuration;
+           ServerEndpoint= _Configuration.GetValue<string>("HelloAAS_API");
+           aasclient = new AssetAdministrationShellHttpClient(new Uri(ServerEndpoint));
         }
 
 

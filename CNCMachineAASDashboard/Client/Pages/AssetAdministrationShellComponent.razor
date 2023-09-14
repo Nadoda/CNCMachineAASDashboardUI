@@ -1,14 +1,9 @@
 @page "/"
 
-@using BaSyx.Models.Core.AssetAdministrationShell.Generics;
 @using CNCMachineAASDashboard.Client.Pages.MaintenanceUI;
 @using CNCMachineAASDashboard.Client.Services;
-@using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
 @using CNCMachineAASDashboard.Shared.Models.AAS;
 @using Microsoft.AspNetCore.SignalR.Client;
-
-
-
 
 
 <RadzenImage Path="Images/Logo.jpg" Style="width: 100%;hight:30px;margin-top:0px; margin-bottom:0px;" />
@@ -27,28 +22,14 @@
         </ul>
     </div>
 
-   
-
     <AssetComponent asset="@aas.asset"></AssetComponent>
-    @*<input type="text" @bind="@message" @onkeypress="HandleKeyPress" />*@
-    @*<button @onclick="async () => await SignalRService.SendMessage(message) "></button>*@
-    @if (messageList != null)
-    {
-        @foreach (var item in messageList)
-        {
-            <h1> @item </h1>
-        }
-    }
-   
-    
+
 }
 else
 {
-
         <h1>Sorry! Unable to receive the data</h1>
         <h1>Check the SignalR Connection Status</h1>
   
-       
  }
  
 
@@ -57,27 +38,14 @@ else
 @code {
 
     private AASModel? aas;
-    public string? message;
-    public List<string>? messageList;
-  
-
-
     [Inject]
     private ISignalRService SignalRService { get; set; }
-    private HubConnection? hubConnection;
-    [Inject]
-    private NavigationManager NavigationManager { get; set; }
-
-
 
     protected override async Task OnInitializedAsync()
     {
         
         SignalRService.OnReceivedAAS += HandleMessageReceived;
-        SignalRService.OnReceivedMessage += HandleMessage;
         await SignalRService.StartConnection();
-        List<string> newList = new List<string>();
-        messageList = newList;
 
     }
    
@@ -88,17 +56,7 @@ else
 
         StateHasChanged();
     }
-    private void HandleMessage(string data)
-    {
 
-
-        messageList?.Add(data);
-
-        StateHasChanged();
-    }
-   
-   
-  
 }
 
 

@@ -1,10 +1,7 @@
 ﻿using CNCMachineAASDashboard.Shared.Models.AAS;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
-using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
 using Submodel = CNCMachineAASDashboard.Shared.Models.AAS.Submodel;
-
-using BaSyx.Models.Core.AssetAdministrationShell.Generics;
 using SubmodelElement = CNCMachineAASDashboard.Shared.Models.AAS.SubmodelElement;
 
 namespace CNCMachineAASDashboard.Client.Services

@@ -10,79 +10,12 @@
     </div>
 
     <main>
-        <article class="content px-4">
+        <article class="content px-4" style="padding-top:0px">
             @Body
         </article>
     </main>
 </div>
 
 @code{
-    //[Inject]
-    //private ISignalRService? SignalRService { get; set; }
-    //public SubmodelElement? OperatingHour;
-    //public SubmodelElement? MaintenanceWarning;
-    //public SubmodelElement? MaintenanceThreshold;
-    //public SubmodelElement? OrderStatus;
-    //protected override async Task OnInitializedAsync()
-    //{
-    //    //SignalRService.OnOperatingHourSE += HandleOHReceived;
-    //    SignalRService.OnMaintenaceWarningSE += HandleMWReceived;
-    //    SignalRService.OnMaintenanceThresholdSE += HandleMTReceived;
-    //    SignalRService.OnOrderStatusSE += HandleOSReceived;
-    //    await SignalRService.StartConnection();
-    //}
-    //private void HandleOHReceived(SubmodelElement data)
-    //{
-    //    OperatingHour = data;
-
-    //    StateHasChanged();
-    //}
-    //private void HandleMWReceived(SubmodelElement data)
-    //{
-    //    MaintenanceWarning = data;
-
-    //    StateHasChanged();
-    //}
-    //private void HandleMTReceived(SubmodelElement data)
-    //{
-    //    MaintenanceThreshold = data;
-
-    //    StateHasChanged();
-    //}
-    //private void HandleOSReceived(SubmodelElement data)
-    //{
-    //    OrderStatus = data;
-
-    //    StateHasChanged();
-    //}
-
-
-     //@if (OperatingHour != null && MaintenanceWarning != null && MaintenanceThreshold != null)
-     //       {
-     //           var OHString = OperatingHour?.value?.ToString();
-     //           var MWString = MaintenanceWarning?.value?.ToString();
-     //           var MTString = MaintenanceThreshold?.value?.ToString();
-     //           int? OH = int.Parse(OHString);
-     //           int? MW = int.Parse(MWString);
-     //           int? MT = int.Parse(MTString);
-     //           @if (OH > MW)
-     //           {
-     //               <RadzenAlert Visible="true" Title="Warning" Text="Maintenance Warning Alarm" Shade="Radzen.Shade.Default" AllowClose="true"
-     //                    AlertStyle="Radzen.AlertStyle.Warning" Style=" flex-direction:row"></RadzenAlert>
-     //               @*<AlertComponent TypeOfAlert=AlertComponent.AlertType.warning Text="Maintenance Warning" Title="Warning"></AlertComponent>*@
-     //           }
-     //           if (OH > MT)
-     //           {
-     //               <RadzenAlert Visible="true" Title="Danger Alert !" Text="Maintenance Threshold is reached" Shade="Radzen.Shade.Default" AllowClose="true"
-     //                    AlertStyle="Radzen.AlertStyle.Danger" Style=" flex-direction:row"></RadzenAlert>
-     //               @*<AlertComponent TypeOfAlert=AlertComponent.AlertType.danger Text="Maintenance Threshold is reached" Title="Maintenance Alarm"></AlertComponent>*@
-     //           }
-
-     //       }
-     //       @if (OrderStatus.value.ToString() == "OrderCompleted")
-     //       {
-     //           <RadzenAlert Visible="true" Title="Success" Text="Order has been completed" Shade="Radzen.Shade.Default" AllowClose="true"
-     //                    AlertStyle="Radzen.AlertStyle.Success" Style=" flex-direction:row"></RadzenAlert>
-     //           @*<AlertComponent TypeOfAlert=AlertComponent.AlertType.success Text="Order has been completed" Title="Success"></AlertComponent>*@
-     //       }
+    
 }

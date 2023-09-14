@@ -1,15 +1,11 @@
 ﻿using CNCMachineAASDashboard.Server.SignalRHub;
 using Microsoft.AspNetCore.SignalR;
 using BaSyx.Models.Extensions;
-using BaSyx.Models.Core.AssetAdministrationShell.Generics;
-using BaSyx.Utils.ResultHandling;
 using Newtonsoft.Json;
 using CNCMachineAASDashboard.Shared.Models.AAS;
 using Submodel = CNCMachineAASDashboard.Shared.Models.AAS.Submodel;
 using CNCMachineAASDashboard.Server.AASHttpClient;
 using SubmodelElement = CNCMachineAASDashboard.Shared.Models.AAS.SubmodelElement;
-using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
-using System.Text.Json;
 
 namespace CNCMachineAASDashboard.Server.Backgroundservice
 {
@@ -22,8 +18,7 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
         private readonly IHubContext<AAShub> _hubContext;
 
         private readonly AASClient Client;
-       
-        private string? ServerEndpoint = Environment.GetEnvironmentVariable("ASPNETCORE_APIURL");
+
         public BackgroundProcess(ILogger<BackgroundProcess> logger, IHubContext<AAShub> hubContext,AASClient client )
         {
 
@@ -57,8 +52,7 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
                     {
                         var AASGetData = result.ToJson();
                        
-                        //Console.WriteLine(AASGetData);
-                       //var AASDeSe = System.Text.Json.JsonSerializer.Deserialize<AssetAdministrationShell>(JsonDocument.Parse(AASGetData));
+                        
                         var obj = JsonConvert.DeserializeObject<AASModel>(AASGetData);
 
                         await _hubContext.Clients.All.SendAsync("AASdataSend", obj);
@@ -66,11 +60,6 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
                         Console.WriteLine($"CNCMAchineAAS dataSent to hub");
 
                     };
-
-                    //var sms = Client.aasclient.RetrieveSubmodels();
-                    //var Result = sms.Entity.Values;
-                    //await _hubContext.Clients.All.SendAsync("SubmodeldataSend", Result);
-
 
                     var MaintenanceSM = Client.aasclient.RetrieveSubmodel("MaintenanceSubmodel");
 
@@ -100,7 +89,7 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
                         var Data = OperationalSM.Entity.ToJson();
                         var OperationalData = System.Text.Json.JsonSerializer.Deserialize<Submodel>(Data);
                         await _hubContext.Clients.All.SendAsync("OperationaldataSend", OperationalData);
-                        Console.WriteLine($"{OperationalSM.Entity.IdShort} dataSent to hub");
+                        
 
 
                     };

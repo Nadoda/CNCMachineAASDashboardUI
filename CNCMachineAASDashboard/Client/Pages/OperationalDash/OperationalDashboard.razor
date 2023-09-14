@@ -1,6 +1,6 @@
 @page "/OperationalData";
 
-@using BaSyx.AAS.Client.Http;
+
 @using Microsoft.AspNetCore.SignalR.Client;
 @using CNCMachineAASDashboard.Shared.Models.AAS;
 @using CNCMachineAASDashboard.Client.Services;
@@ -76,13 +76,8 @@ else
 
 
 @code {
-
-
-
     public Submodel? Submodel;
-
     public Dictionary<string, List<ChartDataPoint>>? seDictionary;
-    public object? SignalRData;
     [Inject]
     private ISignalRService SignalRService { get; set; }
 

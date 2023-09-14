@@ -1,7 +1,5 @@
-﻿@using BaSyx.AAS.Client.Http;
+﻿
 @using System.Text.Json;
-@using BaSyx.Models.Core.Common;
-@using BaSyx.Models;
 @using CNCMachineAASDashboard.Client.Services;
 @using CNCMachineAASDashboard.Shared.Models.AAS;
 @using System.Text;
@@ -10,12 +8,13 @@
 @if (_se.idShort == "OperatingHours")
 {
 
-    <RadzenCard Style="width: 245px; height: 101px; display:grid; margin-top: 15px">
-        <RadzenIcon Icon="schedule" Style="font-size: 60px; width: 56px; height: 58px;color:#cd66e2"></RadzenIcon>
-        <RadzenCard Style="width: 113px; height: 52px; display: inline-block; margin-left: 70px; margin-top: -60px;font-size:larger;justify-content:safe center">
-            <b>@_se.value</b>
+    <RadzenCard Style="width: 245px; height: 78px; display:grid; margin-top: 0px">
+        <RadzenIcon Icon="schedule" Style="font-size: 60px; width: 47px; height: 43px;color:#cd66e2"></RadzenIcon>
+        <RadzenCard Style="width: 119px; height: 46px; display: inline-flex; flex-direction: row; justify-content: space-between; align-items: center; margin-left: 70px; margin-top: -50px; font-size: larger; padding:0px">
+            <div style="display: inline-block;">@_se.value</div>
+            <input placeholder="Edit" style="width: 40px;" type="text" @bind-value="InputValue" @bind-value:event="oninput" @onkeypress="HandleKeyPress" />
         </RadzenCard>
-            <RadzenText Text="Operating Hour" TextAlign="Radzen.TextAlign.Center" Style="height: 29px; font-size: 20px" />
+            <RadzenText Text="Operating Hour" TextAlign="Radzen.TextAlign.Center" Style="height: 28px; font-size: 15px" />
     </RadzenCard>
 
 }
@@ -25,12 +24,12 @@ else if (_se.idShort== "ActualOrderStatus")
 }
 else if (_se.idShort == "MaintenanceCounter")
 {
- <RadzenCard Style="width: 245px; height: 101px; display: grid; margin-top: 15px">
-        <RadzenIcon Icon="timelapse" Style="font-size: 60px; width: 56px; height: 58px;color:#a17fe3"></RadzenIcon>
-        <RadzenCard Style="width: 113px; height: 52px; display: inline-block; margin-left: 70px; margin-top: -60px;font-size:larger;justify-content:safe center">
+ <RadzenCard Style="width: 245px; height: 78px; display: grid; margin-top: 10px">
+        <RadzenIcon Icon="timelapse" Style="font-size: 60px; width: 47px; height: 43px;color:#a17fe3"></RadzenIcon>
+        <RadzenCard Style="width: 119px; height: 46px; display: inline-block; margin-left: 70px; margin-top: -50px;font-size:larger;justify-content:safe center">
             <b>@_se.value</b>
        </RadzenCard>
-    <RadzenText Text="Maintenance Counter" TextAlign="Radzen.TextAlign.Center" Style="height: 29px; font-size: 20px" />
+    <RadzenText Text="Maintenance Counter" TextAlign="Radzen.TextAlign.Center" Style="height: 28px; font-size: 15px" />
   </RadzenCard>
 }
 
@@ -52,8 +51,9 @@ else if (_se?.modelType?.name == "SubmodelElementCollection")
         @*<SECDialogBox Title="Maintenance Record" SeList="valueItemObj"></SECDialogBox>*@
     }
     foreach (var item in valueItemObj)
-    {                    
-         <M_UI_SEComponent _se="item" ></M_UI_SEComponent>
+    {    
+        var SeIdShortPath1 = string.Concat(SeIdShortPath, "/", item.idShort);
+         <M_UI_SEComponent _se="item" SeIdShortPath="@SeIdShortPath1" ></M_UI_SEComponent>
     }
 
 }
@@ -67,15 +67,27 @@ else if (_se?.modelType?.name == "SubmodelElementCollection")
 
 
     [Parameter]
-    public CNCMachineAASDashboard.Shared.Models.AAS.SubmodelElement? _se { get; set; }
-  
+    public SubmodelElement? _se { get; set; }
+    [Parameter, EditorRequired]
+    public string? SeIdShortPath { get; set; }
+    private string? InputValue { get; set; }
+    [Inject]
+    public ISignalRService? signalRService { get; set; }
 
     public List<SubmodelElement> Deserialize(string str)
     {
         var Deserialized = JsonSerializer.Deserialize<List<SubmodelElement>>(str);
         return Deserialized;
     }
+    private async void HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
 
+            await signalRService.UpdateServerValue("MaintenanceSubmodel", SeIdShortPath, InputValue);
+            await InvokeAsync(StateHasChanged);
+        }
+    }
 
 
 }

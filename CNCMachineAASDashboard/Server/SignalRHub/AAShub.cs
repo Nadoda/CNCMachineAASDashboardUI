@@ -1,12 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using CNCMachineAASDashboard.Shared.Models;
 using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
-using BaSyx.Models.Core.AssetAdministrationShell.Generics;
 using CNCMachineAASDashboard.Server.AASHttpClient;
-using BaSyx.AAS.Client.Http;
 using Microsoft.AspNetCore.SignalR.Client;
-using CNCMachineAASDashboard.Shared.Models.AAS;
-using BaSyx.Utils.ResultHandling;
 using Newtonsoft.Json;
 using BaSyx.Models.Extensions;
 using SubmodelElement = CNCMachineAASDashboard.Shared.Models.AAS.SubmodelElement;
