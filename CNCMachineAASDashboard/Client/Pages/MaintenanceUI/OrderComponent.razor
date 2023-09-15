@@ -23,7 +23,7 @@
         pending_actions,
         assignment_turned_in,
         history_toggle_off,
-        cancel,
+        check_circle,
         shopping_bag
     }
     public enum Colors
@@ -42,24 +42,20 @@
             IconSymbol = Icons.assignment_turned_in.ToString();
             ColorCode = Colors.darkgreen.ToString();
         }
-        else if (_se.value.ToString() == "OrderInProgress")
-        {
-            IconSymbol = Icons.history_toggle_off.ToString();
-            ColorCode = Colors.gray.ToString();
-        }
-        else if (_se.value.ToString() == "OrderPending")
+        else if (_se.value.ToString() == "OrderRequestOnProcess")
         {
             IconSymbol = Icons.pending_actions.ToString();
             ColorCode = Colors.gray.ToString();
         }
-        else if (_se.value.ToString() == "OrderRejected")
+        else if (_se.value.ToString() == "OrderSubmitted")
         {
-            IconSymbol = Icons.cancel.ToString();
-            ColorCode = Colors.darkred.ToString();
+            IconSymbol = Icons.check_circle.ToString();
+            ColorCode = Colors.darkgreen.ToString();
         }
+        
         else
         {
-            IconSymbol = Icons.shopping_bag.ToString();
+            IconSymbol = Icons.history_toggle_off.ToString();
             ColorCode = Colors.gray.ToString();
         }
         await InvokeAsync(StateHasChanged);
