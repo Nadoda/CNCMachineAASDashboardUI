@@ -25,5 +25,6 @@ namespace CNCMachineAASDashboard.Client.Services
         Task UpdateServerValue(string SubmodelId, string SeIdShortPath, string value);
         Task RetrieveSE(string SubmodelId, string SeIdShortPath);
         Task StartConnection();
+        Task StopConnection();
     }
 }

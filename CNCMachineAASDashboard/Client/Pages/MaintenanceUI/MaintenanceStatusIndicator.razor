@@ -1,7 +1,7 @@
 ﻿
 @using CNCMachineAASDashboard.Client.Services;
 @using CNCMachineAASDashboard.Shared.Models.AAS;
-
+@implements IDisposable
 
 
 <RadzenRadialGauge Style="width: 250px; height: 250px;">
@@ -39,6 +39,10 @@
         OHValue = double.Parse(data.value.ToString());
         StateHasChanged();
     }
- 
+    public  void Dispose()
+    {
+        SignalRService.OnOperatingHourSE -= HandleOHReceived;
+     
+    }
   
 }

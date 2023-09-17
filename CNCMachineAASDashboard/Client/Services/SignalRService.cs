@@ -96,6 +96,11 @@ namespace CNCMachineAASDashboard.Client.Services
 
             await hubConnection.StartAsync();
         }
+        public async Task StopConnection()
+        {
+
+            await hubConnection.StopAsync();
+        }
         public async Task UpdateServerValue(string SubmodelId, string SeIdShortPath,string value)
         {
             await hubConnection.InvokeAsync("UpdateToServer", SubmodelId,SeIdShortPath, value);

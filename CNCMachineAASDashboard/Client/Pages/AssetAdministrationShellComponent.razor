@@ -1,5 +1,5 @@
 @page "/"
-
+@implements IDisposable
 @using CNCMachineAASDashboard.Client.Pages.MaintenanceUI;
 @using CNCMachineAASDashboard.Client.Services;
 @using CNCMachineAASDashboard.Shared.Models.AAS;
@@ -43,20 +43,24 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        
+
         SignalRService.OnReceivedAAS += HandleMessageReceived;
         await SignalRService.StartConnection();
 
     }
-   
+
     private void HandleMessageReceived(AASModel data)
     {
-      
+
         aas = data;
 
         StateHasChanged();
     }
-
+    public void Dispose()
+    {
+        SignalRService.OnReceivedAAS -= HandleMessageReceived;
+      
+    }
 }
 
 

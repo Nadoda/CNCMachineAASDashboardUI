@@ -1,6 +1,6 @@
 ﻿@page "/MaintenanceDashboard";
 
-
+@implements IDisposable
 @using Microsoft.AspNetCore.SignalR.Client;
 @using CNCMachineAASDashboard.Shared.Models.AAS;
 @using CNCMachineAASDashboard.Client.Services;
@@ -79,6 +79,12 @@ else
         Submodel = data;
 
         StateHasChanged();
+    }
+    
+    public void Dispose()
+    {
+        SignalRService.OnReceivedMaintenance -= HandleMessageReceived;
+
     }
 
 }

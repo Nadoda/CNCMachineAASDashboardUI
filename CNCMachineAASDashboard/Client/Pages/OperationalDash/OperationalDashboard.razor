@@ -1,5 +1,5 @@
 @page "/OperationalData";
-
+@implements IDisposable
 
 @using Microsoft.AspNetCore.SignalR.Client;
 @using CNCMachineAASDashboard.Shared.Models.AAS;
@@ -147,5 +147,11 @@ else
         public DateTime x { get; set; } = DateTime.Now;
         public double value { get; set; }
     }
-
+    public void Dispose()
+    {
+        SignalRService.OnReceivedOperational -= HandleMessageReceived;
+        SignalRService.OnReceivedOperational -= HandleSELogic;
+        
+        seDictionary = null;
+    }
 }

@@ -1,5 +1,5 @@
 @page "/MaintenanceUI";
-
+@implements IDisposable
 @using CNCMachineAASDashboard.Shared.Models.AAS;
 @using CNCMachineAASDashboard.Client.Services;
 
@@ -114,47 +114,59 @@ else
     }
     private void HandleMWReceived(SubmodelElement data)
     {
-       
+
         MW1Value = double.Parse(data.value.ToString());
 
         StateHasChanged();
     }
     private void HandleMTReceived(SubmodelElement data)
     {
-        
+
         MT1Value = double.Parse(data.value.ToString());
 
         StateHasChanged();
     }
     private void HandleMW2Received(SubmodelElement data)
     {
-       
+
         MW2Value = double.Parse(data.value.ToString());
 
         StateHasChanged();
     }
     private void HandleMT2Received(SubmodelElement data)
     {
-      
+
         MT2Value = double.Parse(data.value.ToString());
 
         StateHasChanged();
     }
     private void HandleMW3Received(SubmodelElement data)
     {
-        
+
         MW3Value = double.Parse(data.value.ToString());
 
         StateHasChanged();
     }
     private void HandleMT3Received(SubmodelElement data)
     {
-       
+
         MT3Value = double.Parse(data.value.ToString());
 
         StateHasChanged();
     }
-   
-    
+
+    public void Dispose()
+    {
+        SignalRService.OnReceivedMaintenance -= HandleMaintenanceReceived;
+        SignalRService.OnOperatingHourSE -= HandleOHReceived;
+
+        SignalRService.OnMaintenaceWarningSE -= HandleMWReceived;
+        SignalRService.OnMaintenanceThresholdSE -= HandleMTReceived;
+        SignalRService.OnMaintenaceWarning2SE -= HandleMW2Received;
+        SignalRService.OnMaintenanceThreshold2SE -= HandleMT2Received;
+        SignalRService.OnMaintenaceWarning3SE -= HandleMW3Received;
+        SignalRService.OnMaintenanceThreshold3SE -= HandleMT3Received;
+        
+    }
    
 }
