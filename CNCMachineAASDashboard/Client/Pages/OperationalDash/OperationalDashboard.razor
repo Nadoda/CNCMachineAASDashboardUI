@@ -94,7 +94,7 @@ else
         seDictionary["MachineStatus"] = new List<ChartDataPoint>();
         SignalRService.OnReceivedOperational += HandleMessageReceived;
         SignalRService.OnReceivedOperational += HandleSELogic;
-        //await SignalRService.StartConnection();
+        await SignalRService.StartConnection();
 
     }
 

@@ -95,12 +95,15 @@ namespace CNCMachineAASDashboard.Client.Services
                 OnAASServer_Address?.Invoke(data);
 
             });
-
+           
         }
         public async Task StartConnection()
         {
-
-            await hubConnection.StartAsync();
+            if (hubConnection.State == HubConnectionState.Disconnected)
+            {
+                await hubConnection.StartAsync();
+            }
+            
         }
         public async Task StopConnection()
         {

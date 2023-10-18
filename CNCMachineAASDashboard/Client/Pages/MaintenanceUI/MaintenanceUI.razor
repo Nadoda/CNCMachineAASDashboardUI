@@ -98,8 +98,7 @@ else
         SignalRService.OnMaintenanceThreshold2SE += HandleMT2Received;
         SignalRService.OnMaintenaceWarning3SE += HandleMW3Received;
         SignalRService.OnMaintenanceThreshold3SE += HandleMT3Received;
-
-        //await SignalRService.StartConnection();
+        await SignalRService.StartConnection();
 
     }
     private void HandleMaintenanceReceived(Submodel data)
@@ -157,7 +156,7 @@ else
         StateHasChanged();
     }
 
-    public void Dispose()
+    public async void Dispose()
     {
         SignalRService.OnReceivedMaintenance -= HandleMaintenanceReceived;
         SignalRService.OnOperatingHourSE -= HandleOHReceived;
@@ -168,7 +167,6 @@ else
         SignalRService.OnMaintenanceThreshold2SE -= HandleMT2Received;
         SignalRService.OnMaintenaceWarning3SE -= HandleMW3Received;
         SignalRService.OnMaintenanceThreshold3SE -= HandleMT3Received;
-        
     }
    
 }

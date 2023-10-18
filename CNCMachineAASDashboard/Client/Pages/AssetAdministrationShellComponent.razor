@@ -58,7 +58,7 @@ else
 
         StateHasChanged();
     }
-    public void Dispose()
+    public async void Dispose()
     {
         SignalRService.OnReceivedAAS -= HandleMessageReceived;
       
