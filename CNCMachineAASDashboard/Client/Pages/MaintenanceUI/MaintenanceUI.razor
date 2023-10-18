@@ -31,8 +31,8 @@
             {
                 <div class="col-4" style="display:inline-grid; position:relative;justify-content:center;min-width:350px">
                     <RadzenCard  Style="position:relative; background-color: #d5c2ea;padding-top:0px" Variant="Radzen.Variant.Filled">
-                        <RadzenText Text="@se.idShort" Style="width: 236px; height: 34px; font-size: 25px; color: #0a0a0a; font-weight: 500" TextAlign="Radzen.TextAlign.Center">
-                            
+                        <RadzenText Text="@se.idShort" Style="width: 236px; height: 34px; font-size: 25px; color: #0a0a0a; font-weight: 500"
+                        TextAlign="Radzen.TextAlign.Center">                          
                         </RadzenText>
                         <div style="flex-direction:column;justify-content:center">
                             @if(se.idShort == "Maintenance_1"){
@@ -65,8 +65,10 @@
 }
 else
 {
-    <h1>Sorry! There is nothing at this Page</h1>
-    <h1>Check your SignalR status</h1>
+    <h1>Sorry! Unable to receive the data</h1>
+    <div class="alert alert-warning" role="alert">
+        <strong>Connection Lost!</strong> Unable to connect to the AAS Server.
+    </div>
 }
 
 @code {
@@ -97,7 +99,7 @@ else
         SignalRService.OnMaintenaceWarning3SE += HandleMW3Received;
         SignalRService.OnMaintenanceThreshold3SE += HandleMT3Received;
 
-        await SignalRService.StartConnection();
+        //await SignalRService.StartConnection();
 
     }
     private void HandleMaintenanceReceived(Submodel data)

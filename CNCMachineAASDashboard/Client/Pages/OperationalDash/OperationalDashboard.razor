@@ -40,7 +40,8 @@
             @if (kvp.Key != "MachineStatus")
 
             {
-                <RadzenLineSeries Visible="true" Smooth="true" Data="@kvp.Value" CategoryProperty="x" Title="@kvp.Key" LineType="LineType.Solid"
+                <RadzenLineSeries Visible="true" Smooth="true" Data="@kvp.Value"
+                 CategoryProperty="x" Title="@kvp.Key" LineType="LineType.Solid"
                       ValueProperty="value">
                     <RadzenMarkers MarkerType="MarkerType.Circle"></RadzenMarkers>
                 </RadzenLineSeries>
@@ -58,7 +59,7 @@
         <div class="container-fluid">
             @foreach (var se in Submodel.submodelElements)
             {
-                <SMEcomponent SubmodelId="@Submodel.idShort" SeIdShortPath="@se.idShort" _se="@se" color="#AAE4F3"></SMEcomponent>
+                @*<SMEcomponent SubmodelId="@Submodel.idShort" SeIdShortPath="@se.idShort" _se="@se" color="#AAE4F3"></SMEcomponent>*@
 
             }
 
@@ -68,8 +69,10 @@
 }
 else
 {
-    <h1>Sorry! There is nothing at this Page</h1>
-    <h1>Check your SignalR status</h1>
+    <h1>Sorry! Unable to receive the data</h1>
+    <div class="alert alert-warning" role="alert">
+        <strong>Connection Lost!</strong> Unable to connect to the AAS Server.
+    </div>
 }
 
 
@@ -91,7 +94,7 @@ else
         seDictionary["MachineStatus"] = new List<ChartDataPoint>();
         SignalRService.OnReceivedOperational += HandleMessageReceived;
         SignalRService.OnReceivedOperational += HandleSELogic;
-        await SignalRService.StartConnection();
+        //await SignalRService.StartConnection();
 
     }
 

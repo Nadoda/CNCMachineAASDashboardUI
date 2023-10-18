@@ -26,6 +26,7 @@ namespace CNCMachineAASDashboard.Client.Services
         public event Action<SubmodelElement>? OnMaintenanceThreshold3SE;
         public event Action<SubmodelElement>? OnOrderStatusSE;
         public event Action<SubmodelElement>? OnRetrievedSE;
+        public event Action<dynamic>? OnAASServer_Address;
 
         public SignalRService(NavigationManager navigationManager)
         {
@@ -87,6 +88,11 @@ namespace CNCMachineAASDashboard.Client.Services
             hubConnection.On<SubmodelElement>("RetrieveSESend", data =>
             {
                 OnRetrievedSE?.Invoke(data);
+
+            });
+            hubConnection.On<dynamic>("AASServerAddress", data =>
+            {
+                OnAASServer_Address?.Invoke(data);
 
             });
 

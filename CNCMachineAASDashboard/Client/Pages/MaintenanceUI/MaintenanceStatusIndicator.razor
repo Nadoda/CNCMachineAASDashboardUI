@@ -32,7 +32,7 @@
     protected override async Task OnInitializedAsync()
     {
         SignalRService.OnOperatingHourSE += HandleOHReceived;
-        await SignalRService.StartConnection();
+        //await SignalRService.StartConnection();
     }
     private void HandleOHReceived(SubmodelElement data)
     {

@@ -4,13 +4,13 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime jSRuntime
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="date-time-container container-fluid">
-        <a class="navbar-brand" href="">CNCMachineAASDashboard</a>
-        
-            <div>
-                <p id="dateTimeElement"></p>
-            </div>
+<div class="top-row ps-3 navbar navbar-dark" style="align-content:center;padding:0px;padding-left:0px">
+    <div class="date-time-container container-fluid" style="width:100%;padding:0px">
+        <a class="navbar-brand" href="" style="width:100%;text-align:center">AASDashboard</a>
+
+        <div style="width:100%;text-align:center">
+            <p id="dateTimeElement"></p>
+         </div>
         
     </div>
 </div>
@@ -45,32 +45,46 @@
         </div>*@
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="OperationalData" Match="NavLinkMatch.All">
-                <span class="oi oi-graph" aria-hidden="true"></span> OperationalData
+                <span class="oi oi-graph" aria-hidden="true"></span> OperationalData 
             </NavLink>
         </div>
+   
         
     </nav>
 </div>
 
 @code {
+    [Inject]
+    private ISignalRService? SignalRService { get; set; }
     private bool collapseNavMenu = true;
     private AASModel? _model;
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-    [Inject]
-    IConfiguration? configuration { get; set; }
     private string? url;
 
-    
+    protected override async Task OnInitializedAsync()
+    {
+        SignalRService.OnAASServer_Address += HandleAASServer_Address;
+
+    }
+
     protected override async void OnAfterRender(bool firstRender)
     {
         if (firstRender)
         {
-            // Call the JavaScript function every second
+            // the JavaScript function is called every second
             await jSRuntime.InvokeVoidAsync("updateDateTime");
             var interval = 1000; // 1 second
             await jSRuntime.InvokeVoidAsync("setInterval", "updateDateTime()", interval);
         }
     }
+
+    private void HandleAASServer_Address(dynamic data)
+    {
+
+        url = data.GetString();
+        StateHasChanged();
+    }
+
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
@@ -78,7 +92,6 @@
 
     private async Task OpenNewTab()
     {
-        url = configuration.GetValue<string>("HelloAAS_API");
         await NavigationManager.NavigationTonewWindow(jSRuntime, url, "Redirecting to AAS Server");
     }
     
