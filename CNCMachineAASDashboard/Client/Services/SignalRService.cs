@@ -24,6 +24,8 @@ namespace CNCMachineAASDashboard.Client.Services
         public event Action<SubmodelElement>? OnMaintenanceThreshold2SE;
         public event Action<SubmodelElement>? OnMaintenaceWarning3SE;
         public event Action<SubmodelElement>? OnMaintenanceThreshold3SE;
+        public event Action<SubmodelElement>? OnMaintenaceWarning4SE;
+        public event Action<SubmodelElement>? OnMaintenanceThreshold4SE;
         public event Action<SubmodelElement>? OnOrderStatusSE;
         public event Action<SubmodelElement>? OnRetrievedSE;
         public event Action<dynamic>? OnAASServer_Address;
@@ -79,6 +81,15 @@ namespace CNCMachineAASDashboard.Client.Services
             {
 
                 OnMaintenanceThreshold3SE?.Invoke(data);
+            });
+            hubConnection.On<SubmodelElement>("MaintenanceWarning4SESend", data =>
+            {
+                OnMaintenaceWarning4SE?.Invoke(data);
+            });
+            hubConnection.On<SubmodelElement>("MaintenanceThreshold4SESend", data =>
+            {
+
+                OnMaintenanceThreshold4SE?.Invoke(data);
             });
             hubConnection.On<SubmodelElement>("ActualOrderStatusSESend", data =>
             {

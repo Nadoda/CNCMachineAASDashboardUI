@@ -32,12 +32,22 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
 
         protected async override Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            bool PrintFlag = true;
             while (!stoppingToken.IsCancellationRequested)
             {
               
                 try
                 {
-                    await _hubContext.Clients.All.SendAsync("AASServerAddress", new Uri(Environment.GetEnvironmentVariable("AASServer_Address")));
+                    string? ServerAddress = Environment.GetEnvironmentVariable("AASServer_Address");
+
+                    if (PrintFlag)
+                    {
+                        Console.WriteLine($"The connected AAS Server: {ServerAddress}");
+                        PrintFlag= false;
+                    }
+                    if (ServerAddress == null) { break; }
+
+                    await _hubContext.Clients.All.SendAsync("AASServerAddress", new Uri(ServerAddress));
 
                     var aas = Client?.aasclient?.RetrieveAssetAdministrationShell();
 
@@ -58,7 +68,7 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
 
                         await _hubContext.Clients.All.SendAsync("AASdataSend", obj);
 
-                        Console.WriteLine($"CNCMAchineAAS dataSent to hub");
+                        //Console.WriteLine($"CNCMAchineAAS dataSent to hub");
 
                     };
 
@@ -72,7 +82,7 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
                     else
                     {
                         var Data = MaintenanceSM.Entity.ToJson();
-                        Console.WriteLine(Data);
+                        //Console.WriteLine(Data);
                         var MaintenanceData = System.Text.Json.JsonSerializer.Deserialize<Submodel>(Data);
 
                         await _hubContext.Clients.All.SendAsync("MaintenancedataSend", MaintenanceData);
@@ -164,14 +174,22 @@ namespace CNCMachineAASDashboard.Server.Backgroundservice
                     var MaintenanceThreshold3Data = System.Text.Json.JsonSerializer.Deserialize<SubmodelElement>(MaintenanceThreshold3SE.Entity.ToJson());
                     await _hubContext.Clients.All.SendAsync("MaintenanceThreshold3SESend", MaintenanceThreshold3Data);
 
+                    var MaintenanceWarning4SE = Client?.aasclient?.RetrieveSubmodelElement("MaintenanceSubmodel", "Maintenance_4/MaintenanceDetails/MaintenanceWarning");
+                    var MaintenanceWarning4Data = System.Text.Json.JsonSerializer.Deserialize<SubmodelElement>(MaintenanceWarning4SE.Entity.ToJson());
+                    await _hubContext.Clients.All.SendAsync("MaintenanceWarning4SESend", MaintenanceWarning4Data);
+
+
+                    var MaintenanceThreshold4SE = Client?.aasclient?.RetrieveSubmodelElement("MaintenanceSubmodel", "Maintenance_4/MaintenanceDetails/MaintenanceThreshold");
+                    var MaintenanceThreshold4Data = System.Text.Json.JsonSerializer.Deserialize<SubmodelElement>(MaintenanceThreshold4SE.Entity.ToJson());
+                    await _hubContext.Clients.All.SendAsync("MaintenanceThreshold4SESend", MaintenanceThreshold4Data);
                     await Task.Delay(1000);
                     
 
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Something Went Wrong!");
-                    ex.ToString();
+                    Console.WriteLine("Something Went Wrong!, Exception has occured");
+                    Console.WriteLine(ex.ToString()); 
                     await Task.Delay(1000);
 
                 }

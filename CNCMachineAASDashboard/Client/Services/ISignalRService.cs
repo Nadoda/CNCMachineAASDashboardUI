@@ -19,6 +19,8 @@ namespace CNCMachineAASDashboard.Client.Services
         event Action<SubmodelElement>? OnMaintenanceThreshold2SE;
         event Action<SubmodelElement>? OnMaintenaceWarning3SE;
         event Action<SubmodelElement>? OnMaintenanceThreshold3SE;
+        event Action<SubmodelElement>? OnMaintenaceWarning4SE;
+        event Action<SubmodelElement>? OnMaintenanceThreshold4SE;
         event Action<SubmodelElement>? OnRetrievedSE;
         event Action<dynamic>? OnAASServer_Address;
         bool IsConnected { get; }

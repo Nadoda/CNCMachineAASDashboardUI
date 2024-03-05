@@ -28,7 +28,7 @@ namespace CNCMachineAASDashboard.Server.SignalRHub
             var result = _Client.aasclient.RetrieveSubmodelElement(SubmodelId, SeIdShortPath);
             var Deserialise = JsonConvert.DeserializeObject<SubmodelElement>(result.Entity.ToJson());
             await Clients.All.SendAsync("RetrieveSESend", Deserialise);
-
+          
         }
 
         /*

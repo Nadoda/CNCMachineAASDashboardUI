@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.ResponseCompression;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var AASServer_Address = Environment.GetEnvironmentVariable("AASServer_Address");
+
 // Add services to the container.
 
 builder.Services.AddControllersWithViews();

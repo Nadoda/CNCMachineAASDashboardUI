@@ -83,7 +83,7 @@ else if (_se?.modelType?.name == "SubmodelElementCollection")
     {
         if (e.Key == "Enter")
         {
-
+            Console.WriteLine(SeIdShortPath,InputValue);
             await signalRService.UpdateServerValue("MaintenanceSubmodel", SeIdShortPath, InputValue);
             await InvokeAsync(StateHasChanged);
         }
